@@ -32,3 +32,7 @@ The main two are [Neovim](https://neovim.io), my text editor, and [qutebrowser](
 I also use a tiling window manager called [bspwm](https://github.com/baskerville/bspwm), so I don't need to arrange application windows with a mouse.
 
 I'm planning to package for my full voice control set up.
+
+## Contact
+
+You can ask for help or send patches by composing an email to [~geb/public-inbox@lists.sr.ht](https://lists.sr.ht/~geb/public-inbox).
