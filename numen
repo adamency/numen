@@ -1,0 +1,44 @@
+#!/bin/sh
+
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
+handler=handlers/kernel
+mic=
+model="${NUMEN_MODEL:-model}"
+args="$(getopt -n numen -o h -l help,kernel,list-mics,mic:,x11 -- "$@")" || exit
+eval set -- "$args"
+while :; do
+	case "$1" in
+	-h|--help) echo 'numen [PHRASE_FILE] [PHRASE_FILE...]
+--kernel          Use the kernel handler to perform the actions (the default).
+--list-mics       List audio devices and exit.
+--mic=NAME        Select the audio device.
+--x11             Use the X11 handler to perform the actions.'; exit;;
+	--kernel) handler=handlers/kernel; shift;;
+	--list-mics) arecord -L | sed -E '/^sysdefault:/ !d; s/.*=//; N'; exit;;
+	--mic) mic="$2"; shift 2;;
+	--x11) handler=handlers/x11; shift;;
+	--) shift; break;;
+	esac
+done
+
+if [ $# = 0 ]; then
+	if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}"/numen/phrases ]; then
+		set -- $(find "${XDG_CONFIG_HOME:-$HOME/.config}"/numen/phrases/ -maxdepth 1 \! -type d)
+	else
+		set -- $(find /etc/numen/phrases/ -maxdepth 1 \! -type d)
+	fi
+fi
+
+if [ "$NUMEN_PIPE" ]; then
+	pipe="$NUMEN_PIPE"
+else
+	tmpdir="$(mktemp -d)"
+	trap 'rm -rf "$tmpdir"' EXIT INT TERM HUP
+	pipe="$tmpdir/pipe"
+	mkfifo -m 600 "$pipe" || exit
+
+	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
+fi
+
+export NUMEN_HANDLER="${handler#*/}"
+./instructor < "$pipe" | "$handler" "$pipe"

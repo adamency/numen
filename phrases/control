@@ -1,0 +1,57 @@
+space:press space
+okay:press Return
+tab:press Tab
+@rapidoff scape:unstick press Escape
+
+shift:mod shift
+troll:mod ctrl
+hype:mod alt
+@rapidoff suck:mod super unstick
+@rapidoff forget:mod clear capsoff unstick
+
+# Turn on Caps Lock, turn it off by saying "forget".
+# The super modifier needs to be down.
+shout:localeval [ "$NUMEN_SUPER" = 1 ] && echo capson\
+mod clear
+
+# Hold down each pressed key, stop by saying "forget".
+@rapidon sticky:stick
+
+hack:press BackSpace
+scrap:press BackSpace BackSpace
+toss:press Delete
+crevice:press Delete Delete
+raze:press BackSpace BackSpace BackSpace BackSpace
+wipe:press ctrl+BackSpace
+
+left:press Left
+right:press Right
+up:press Up
+down:press Down
+lunge:press Left Left
+rush:press Right Right
+evade:press Left Left Left Left
+assail:press Right Right Right Right
+
+# PageDown, PageUp, Home, End
+page:press Next
+reel:press Prior
+home:press Home
+end:press End
+
+@rapidoff pastry:unstick press XF86Paste
+
+again:repeat 1
+double:repeat 2
+handful:repeat 4
+fistful:repeat 8
+plateful:repeat 12
+
+# Backward/Forward History and Refresh (often supported by web browsers)
+backward:press XF86Back
+forward:press XF86Forward
+refresh:press XF86Refresh
+
+# Menu of function keys and friends
+functions:set DISPLAY displaying\
+eval printf 'F1\nF2\nF3\nF4\nF5\nF6\nF7\nF8\nF9\nF10\nF11\nF12\nsterling £\nEuroSign €\nMenu\nInsert\nNum_Lock\nPrint\nScroll_Lock\nPause\n' | dmenu -i | sed -E 's/^ *([^ ]+).*/press \1/' &

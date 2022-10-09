@@ -1,0 +1,280 @@
+#!/bin/sh
+# ./handlers/helper/ydo
+
+# Returns whether $1 starts with $2.
+prefixed() { [ "${1#$2}" != "$1" ]; }
+
+numenydotool() {
+	while IFS= read -r line; do
+		if prefixed "$line" export; then
+			export -- "${line#export }"
+		elif prefixed "$line" key; then
+			ydotool "${line%% *}" -d "${NUMEN_KEY_DELAY:-4}" -- ${line#* }
+		elif prefixed "$line" type; then
+			ydotool type -D "${NUMEN_TYPE_DELAY:-4}" -- "${line#type[[:blank:]]}"
+		else
+			ydotool $line
+		fi
+	done
+}
+
+./awk -f /proc/self/fd/3 3<< 'EOF' | numenydotool
+
+# The are the Linux values but the X11 names.
+# The Linux values can be found in:
+# /usr/include/linux/input-event-codes.h/usr/include/linux/input-event-codes.h
+# I generated most of these simulating keystrokes to another computer using
+# my gadget command and reading them with showkey.
+# They are incomplete.
+BEGIN {
+	M["control"] = M["control_l"] = M["ctrl"] = M["ctrl_l"] = 29
+	M["shift"] = M["shift_l"] = 42
+	M["alt"] = M["alt_l"] = 56
+	M["super"] = M["super_l"] = 125
+	M["control_r"] = M["ctrl_r"] = 97
+	M["shift_r"] = 54
+	M["alt_r"] = 100
+	M["super_r"] = 126
+
+	K["control"] = K["control_l"] = K["ctrl"] = K["ctrl_l"] = 29
+	K["shift"] = K["shift_l"] = 42
+	K["alt"] = K["alt_l"] = 56
+	K["super"] = K["super_l"] = 125
+	K["control_r"] = K["ctrl_r"] = 97
+	K["shift_r"] = 54
+	K["alt_r"] = 100
+	K["super_r"] = 126
+	K2["A"] = K["a"] = 30
+	K2["B"] = K["b"] = 48
+	K2["C"] = K["c"] = 46
+	K2["D"] = K["d"] = 32
+	K2["E"] = K["e"] = 18
+	K2["F"] = K["f"] = 33
+	K2["G"] = K["g"] = 34
+	K2["H"] = K["h"] = 35
+	K2["I"] = K["i"] = 23
+	K2["J"] = K["j"] = 36
+	K2["K"] = K["k"] = 37
+	K2["L"] = K["l"] = 38
+	K2["M"] = K["m"] = 50
+	K2["N"] = K["n"] = 49
+	K2["O"] = K["o"] = 24
+	K2["P"] = K["p"] = 25
+	K2["Q"] = K["q"] = 16
+	K2["R"] = K["r"] = 19
+	K2["S"] = K["s"] = 31
+	K2["T"] = K["t"] = 20
+	K2["U"] = K["u"] = 22
+	K2["V"] = K["v"] = 47
+	K2["W"] = K["w"] = 17
+	K2["X"] = K["x"] = 45
+	K2["Y"] = K["y"] = 21
+	K2["Z"] = K["z"] = 44
+	K2["exclam"] = K["1"] = 2
+	K2["at"] = K["2"] = 3
+	K2["numbersign"] = K["3"] = 4
+	K2["dollar"] = K["4"] = 5
+	K2["percent"] = K["5"] = 6
+	K2["asciicircum"] = K["6"] = 7
+	K2["ampersand"] = K["7"] = 8
+	K2["asterisk"] = K["8"] = 9
+	K2["parenleft"] = K["9"] = 10
+	K2["parenright"] = K["0"] = 11
+	K["return"] = 28
+	K["escape"] = 1
+	K["backspace"] = 14
+	K["tab"] = 15
+	K["space"] = 57
+	K2["underscore"] = K["minus"] = 12
+	K2["plus"] = K["equal"] = 13
+	K2["braceleft"] = K["bracketleft"] = 26
+	K2["braceright"] = K["bracketright"] = 27
+	K2["bar"] = C["\\"] = K["backslash"] = 43
+	K2["colon"] = K["semicolon"] = 39
+	C2["\""] = K2["quotedbl"] = K["apostrophe"] = 40
+	K2["asciitilde"] = K["grave"] = 41
+	K2["less"] = K["comma"] = 51
+	K2["greater"] = K["period"] = 52
+	K2["question"] = K["slash"] = 53
+	K["caps_lock"] = 58
+	K["f1"] = 59
+	K["f2"] = 60
+	K["f3"] = 61
+	K["f4"] = 62
+	K["f5"] = 63
+	K["f6"] = 64
+	K["f7"] = 65
+	K["f8"] = 66
+	K["f9"] = 67
+	K["f10"] = 68
+	K["f11"] = 87
+	K["f12"] = 88
+	K["print_screen"] = 99
+	K["scroll_lock"] = 70
+	K["pause_break"] = 119
+	K["insert"] = 110
+	K["home"] = 102
+	K["prior"] = K["page_up"] = 104
+	K["delete"] = 111
+	K["end"] = 107
+	K["next"] = K["page_down"] = 109
+	K["right"] = 106
+	K["left"] = 105
+	K["down"] = 108
+	K["up"] = 103
+	K["clear"] = 69
+	K["num_lock"] = 69
+	K["kp_divide"] = 98
+	K["kp_multiply"] = 55
+	K["kp_minus"] = 74
+	K["kp_plus"] = 78
+	K["kp_enter"] = 96
+	K["kp_end"] = K["kp_1"] = 79
+	K["kp_down"] = K["kp_2"] = 80
+	K["kp_next"] = K["kp_3"] = 81
+	K["kp_left"] = K["kp_4"] = 75
+	K["kp_begin"] = K["kp_5"] = 76
+	K["kp_right"] = K["kp_6"] = 77
+	K["kp_home"] = K["kp_7"] = 71
+	K["kp_up"] = K["kp_8"] = 72
+	K["kp_prior"] = K["kp_9"] = 73
+	K["kp_insert"] = K["kp_0"] = 82
+	K["kp_decimal"] = K["kp_decimal"] = 83
+	K["menu"] = 127
+	K["f13"] = 183
+	K["f14"] = 184
+	K["f15"] = 185
+	K["f16"] = 186
+	K["f17"] = 187
+	K["f18"] = 188
+	K["f19"] = 189
+	K["f20"] = 190
+	K["f21"] = 191
+	K["f22"] = 192
+	K["f23"] = 193
+	K["f24"] = 194
+	K["xf86copy"] = 133
+	K["xf86paste"] = 135
+	K["xf86back"] = 158
+	K["xf86forward"] = 159
+	K["xf86refresh"] = 173
+}
+
+BEGIN {
+	Release = ""
+}
+
+function unknown_modifier(s) { print "Ignoring unknown modifier: "s > "/dev/stderr" }
+function unknown_key(s) { print "Ignoring unknown key: "s > "/dev/stderr" }
+function unknown_button(s) { print "Ignoring unknown button: "s > "/dev/stderr" }
+
+function release() {
+	if (length(Release)) print Release
+	Release = ""
+}
+
+function keydown(mods, name,    k) {
+	release()
+	printf "key "
+	Release = "key "
+	for (k in mods) {
+		if (mods[k] in M) {
+			printf M[mods[k]]":1 "
+			Release = Release M[mods[k]]":0 "
+		} else {
+			unknown_modifier(mods[k])
+		}
+	}
+	if ((name in K2 && k = K2[name]) || (tolower(name) in K2 && k = K2[tolower(name)])) {
+		printf M["shift"]":1 "
+		Release = Release M["shift"]":0 "
+		print k":1"
+		Release = Release k":0"
+	} else if (tolower(name) in K) {
+		print K[tolower(name)]":1"
+		Release = Release K[tolower(name)]":0"
+	} else {
+		print "0"
+		unknown_key(name)
+	}
+}
+
+function click(button, mask) {
+	if (button == "left" || button == "1") {
+		print "click 0x"mask"0"
+	} else if (button == "middle" || button == "2") {
+		print "click 0x"mask"2"
+	} else if (button == "right" || button == "3") {
+		print "click 0x"mask"1"
+	} else {
+		unknown_button(button)
+	}
+}
+
+function k() {
+	for (i=2; i<=NF; i++) {
+		n = split($i, parts, /\+/)
+		key = parts[n]
+		delete parts[n]
+		keydown(parts, key)
+	}
+}
+$1 == "key" {
+	k()
+	release()
+	fflush()
+	next
+}
+$1 == "keydown" {
+	k()
+	fflush()
+	next
+}
+$1 == "keyup" {
+	release()
+	fflush()
+	next
+}
+$1 == "type" {
+	print
+	fflush()
+	next
+}
+
+$1 == "click" {
+	for (i=2; i<=NF; i++) click($i, "C")
+	fflush()
+	next
+}
+$1 == "buttondown" {
+	for (i=2; i<=NF; i++) click($i, "4")
+	fflush()
+	next
+}
+$1 == "buttonup" {
+	for (i=2; i<=NF; i++) click($i, "8")
+	fflush()
+	next
+}
+
+$1 == "mousemove" {
+	$1 = "mousemove --"
+	print
+	fflush()
+	next
+}
+$1 == "mouseto" {
+	$1 = "mousemove --absolute --"
+	print
+	fflush()
+	next
+}
+
+$1 == "export" {
+	print
+	fflush()
+	next
+}
+
+{ print "Ignoring: "$0 > "/dev/stderr" }
+EOF

@@ -1,0 +1,7 @@
+#!/bin/sh
+exec 2>&1
+[ -r ./conf ] && . ./conf
+: ${NUMENUSER:=_numen}
+mkdir -p /usr/share/numen
+chown $NUMENUSER:$NUMENUSER /usr/share/numen || exit
+XDG_DATA_HOME="${XDG_DATA_HOME:-/usr/share}" exec chpst -u $NUMENUSER:input:audio /usr/local/bin/numen ${OPTS}

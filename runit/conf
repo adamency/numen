@@ -1,0 +1,6 @@
+# Example to run numen as a specific user:
+
+# NUMENUSER=john
+# export XAUTHORITY="/run/user/$(id -u $NUMENUSER)/Xauthority"
+# export XDG_DATA_HOME="/home/$NUMENUSER/.local/share"
+# OPTS=$(find "/home/$NUMENUSER/.config/numen/phrases/" -maxdepth 1 \! -type d)

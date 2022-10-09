@@ -1,0 +1,43 @@
+#!/bin/sh
+# ./handlers/kernel PIPE
+export NUMEN_HANDLER=kernel
+
+alias print='printf %s\\n'
+alias shell='${NUMEN_SHELL:-/bin/sh}'
+
+# Returns whether $1 starts with $2.
+prefixed() { [ "${1#$2}" != "$1" ]; }
+
+ydotool debug > /dev/null 2> /dev/null || {
+	ydotoold
+	kill -$$
+} &
+
+unset caps
+while IFS= read -r line; do
+	line="${line#local}"
+	if prefixed "$line" type; then
+		export NUMEN_TEXT="${line#type }"
+		print "$line"
+	elif [ "$line" = capson ]; then
+		[ "$caps" ] || print "key Caps_Lock"
+		caps=1
+	elif [ "$line" = capsoff ]; then
+		[ "$caps" ] && print "key Caps_Lock"
+		unset caps
+	elif prefixed "$line" pen; then
+		export NUMEN_TEXT="$(shell -c "${line#pen }")"
+		print "$NUMEN_TEXT" | sed 's/^/type /; 1 !s/^/key Return\n/'
+	elif prefixed "$line" eval; then
+		shell -c "${line#eval }" > "$1"
+	elif prefixed "$line" set; then
+		line="${line#set }"
+		assignment="${line%% *}=$(shell -c "${line#* }")"
+		export -- "$assignment"
+		print "export $assignment"
+	elif prefixed "$line" handler; then
+		exec "handlers/${line#handler }"
+	else
+		print "$line"
+	fi
+done | handlers/helper/ydo

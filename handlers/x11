@@ -1,0 +1,59 @@
+#!/bin/sh
+# ./handlers/x11 PIPE
+export NUMEN_HANDLER=x11
+
+alias print='printf %s\\n'
+alias shell='${NUMEN_SHELL:-/bin/sh}'
+
+# Returns whether $1 starts with $2.
+prefixed() { [ "${1#$2}" != "$1" ]; }
+
+iscapson() {
+	command -v xset > /dev/null || return 1
+	xset q | awk '/Caps Lock/ {exit $4 == "off"}'
+}
+iscapsoff() {
+	command -v xset > /dev/null || return 1
+	xset q | awk '/Caps Lock/ {exit $4 != "off"}'
+}
+
+xdotoolstdin() {
+	while IFS= read -r line; do
+		if prefixed "$line" type; then
+			# The '' stops xdotool complaining if there's nothing to type.
+			xdotool $(print ${line%%-- *}) -- "${line#*-- }" ''
+		else
+			xdotool $line
+		fi
+	done
+}
+
+while IFS= read -r line; do
+	line="${line#local}"
+	if prefixed "$line" key; then
+		print "${line%% *} --delay ${NUMEN_KEY_DELAY:-4} -- ${line#* }"
+	elif prefixed "$line" type; then
+		export NUMEN_TEXT="${line#type }"
+		print "type --delay ${NUMEN_TYPE_DELAY:-4} -- $NUMEN_TEXT"
+	elif [ "$line" = capson ]; then
+		iscapsoff && print "key --delay ${NUMEN_KEY_DELAY:-4} Caps_Lock"
+	elif [ "$line" = capsoff ]; then
+		iscapson && print "key --delay ${NUMEN_KEY_DELAY:-4} Caps_Lock"
+	elif prefixed "$line" click; then
+		print "$line" | sed 's/left/1/; s/middle/2/; s/right/3/; s/scrollup/4/; s/scrolldown/5/'
+	elif prefixed "$line" mousemove; then
+		print "mousemove_relative --${line#mousemove}"
+	elif prefixed "$line" mouseto; then
+		print "mousemove --${line#mouseto}"
+	elif prefixed "$line" pen; then
+		export NUMEN_TEXT="$(shell -c "${line#pen }")"
+		print "$NUMEN_TEXT" | sed "s/^/type --delay ${NUMEN_TYPE_DELAY} -- /; 1 !s/^/key --delay ${NUMEN_TYPE_DELAY} -- Return\n/"
+	elif prefixed "$line" eval; then
+		shell -c "${line#eval }" > "$1"
+	elif prefixed "$line" set; then
+		line="${line#set }"
+		export -- "${line%% *}=$(shell -c "${line#* }")"
+	elif prefixed "$line" handler; then
+		exec "handlers/${line#handler }"
+	fi
+done | xdotoolstdin
