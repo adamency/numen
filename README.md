@@ -1,6 +1,7 @@
 # Numen
 
-Numen is voice control for handsfree computing, empowering people who have limited or no use of their hands.
+Numen is voice control for desktop computing without a keyboard or mouse.
+It works system-wide on your Linux machine.
 
 ## Installation From Source
 
