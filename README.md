@@ -25,15 +25,15 @@ The default phrases are in the `/etc/numen/phrases/` directory, you could copy t
 The most important files are `phrases/characters` with the alphabet and symbols, and `phrases/control` with the modifiers, backspace and friends.
 Have a go in your text editor.
 
-## Workflow
+## Going Further
 
 Voice control makes an efficient keyboard but a wack mouse.
 At first I thought I'd need something like eye tracking, but now I just use keyboard based programs, which are thankfully the most productive kind of program.
 The main two are [Neovim](https://neovim.io), my text editor, and [qutebrowser](https://qutebrowser.org), my web browser.
-I also use a tiling window manager called [bspwm](https://github.com/baskerville/bspwm), so I don't need to arrange application windows with a mouse.
 
-I'm planning to package for my full voice control set up.
+I've also made a desktop environment that works well with voice control, called [tiles](https://git.sr.ht/~geb/tiles).
 
 ## Contact
 
 You can ask for help or send patches by composing an email to [~geb/public-inbox@lists.sr.ht](https://lists.sr.ht/~geb/public-inbox).
+You're also welcome to join our Matrix chat at [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
