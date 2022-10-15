@@ -8,6 +8,16 @@ alias shell='${NUMEN_SHELL:-/bin/sh}'
 # Returns whether $1 starts with $2.
 prefixed() { [ "${1#$2}" != "$1" ]; }
 
+if [ "$(id -u)" != 0 ] && ! id -nG | tr ' ' '\n' | grep -q '^input$'; then
+	echo 'numen: WARNING: You might need to add yourself to group input:
+
+    $ sudo usermod -a -G input $USER
+
+and then re-login to make it effective.
+You can check the the output of `id -nG` or `groups`.
+' > /dev/stderr
+fi
+
 ydotool debug > /dev/null 2> /dev/null || {
 	ydotoold
 	echo 'numen: ydotoold failed, exiting...' 2> /dev/null
