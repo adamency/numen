@@ -10,6 +10,11 @@ checksum=02311cdc608f205711b06a95e5fd71093b2294f4920efc526f5e98a2ddab42b8
 ! command -v tar > /dev/null && echo 'you need tar' && exit 1
 ! command -v wget > /dev/null && echo 'you need wget' && exit 1
 
+cp ydotool-files/80-uinput.rules /usr/lib/udev/rules.d || exit
+cp ydotool-files/50-ydotool.conf /usr/share/X11/xorg.conf.d || exit
+
+mkdir -p tmp && cd tmp || exit
+
 wget "$distfile" -O ydotool.tar.gz || exit
 if [ "$(sha256sum ydotool.tar.gz | cut -d' ' -f1)" != "$checksum" ]; then
 	echo 'ydotool.tar.gz did not match checksum'
@@ -17,15 +22,12 @@ if [ "$(sha256sum ydotool.tar.gz | cut -d' ' -f1)" != "$checksum" ]; then
 fi
 
 tar xf ydotool.tar.gz || exit
-cd "ydotool-${version}" && rm -rf build && mkdir build && cd build || exit
+cd "ydotool-${version}" || exit
+patch -Np1 < ../../ydotool-files/man-update-for-1.0.1.patch || exit
+patch -Np1 < ../../ydotool-files/socket-group-permission.patch || exit
+rm -rf build && mkdir build && cd build || exit
 cmake .. && make -j "$(nproc)" || exit
-cp ydotool ydotoold /usr/libexec || exit
-
-cd ../../ydotool-workarounds || exit
-cp ydotool-workaround /usr/bin/ydotool || exit
-cp ydotoold-workaround /usr/bin/ydotoold || exit
-cp 80-uinput.rules /usr/lib/udev/rules.d || exit
-cp 50-ydotool.conf /usr/share/X11/xorg.conf.d || exit
+cp ydotool ydotoold /usr/bin || exit
 
 echo 'Installed successfully.'
 echo 'You will need to add yourself to group input:
