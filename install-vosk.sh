@@ -3,8 +3,10 @@ version=0.3.42
 vosk_file="vosk-linux-$(uname -m)-${version}"
 model=vosk-model-small-en-us-0.15
 
-! command -v unzip > /dev/null && echo 'you need unzip' && exit 1
-! command -v wget > /dev/null && echo 'you need wget' && exit 1
+ok=1
+! command -v unzip > /dev/null && echo 'you need unzip' && unset ok
+! command -v wget > /dev/null && echo 'you need wget' && unset ok
+[ "$ok" ] || exit
 
 mkdir -p tmp && cd tmp || exit
 

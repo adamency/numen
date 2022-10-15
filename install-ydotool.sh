@@ -3,12 +3,14 @@ version=1.0.1
 distfile="https://github.com/ReimuNotMoe/ydotool/archive/v${version}.tar.gz"
 checksum=02311cdc608f205711b06a95e5fd71093b2294f4920efc526f5e98a2ddab42b8
 
-! command -v cmake > /dev/null && echo 'you need cmake' && exit 1
-! command -v g++ > /dev/null && echo 'you need g++' && exit 1
-! command -v make > /dev/null && echo 'you need make' && exit 1
-! command -v scdoc > /dev/null && echo 'you need scdoc' && exit 1
-! command -v tar > /dev/null && echo 'you need tar' && exit 1
-! command -v wget > /dev/null && echo 'you need wget' && exit 1
+ok=1
+! command -v cmake > /dev/null && echo 'you need cmake' && unset ok
+! command -v g++ > /dev/null && echo 'you need g++' && unset ok
+! command -v make > /dev/null && echo 'you need make' && unset ok
+! command -v scdoc > /dev/null && echo 'you need scdoc' && unset ok
+! command -v tar > /dev/null && echo 'you need tar' && unset ok
+! command -v wget > /dev/null && echo 'you need wget' && unset ok
+[ "$ok" ] || exit
 
 # Directory for the socket. See ./ydotool-files/socket-group-permission.patch
 mkdir -p /var/lib/ydotoold || exit
