@@ -25,4 +25,7 @@ cp displaying /usr/local/bin || exit
 # Install the manpage if the scdoc command is installed
 command -v scdoc > /dev/null && scdoc < numen.1.scd > /usr/share/man/man1/numen.1
 
+# not necessary but lets you run ./numen in this directory
+ln -sf /usr/local/share/vosk-models/small-en-us model
+
 echo 'Installed successfully.'
