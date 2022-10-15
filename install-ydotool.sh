@@ -10,6 +10,10 @@ checksum=02311cdc608f205711b06a95e5fd71093b2294f4920efc526f5e98a2ddab42b8
 ! command -v tar > /dev/null && echo 'you need tar' && exit 1
 ! command -v wget > /dev/null && echo 'you need wget' && exit 1
 
+# Directory for the socket. See ./ydotool-files/socket-group-permission.patch
+mkdir -p /var/lib/ydotoold || exit
+chown :input /var/lib/ydotoold && chmod 775 /var/lib/ydotoold || exit
+
 cp ydotool-files/80-uinput.rules /usr/lib/udev/rules.d || exit
 cp ydotool-files/50-ydotool.conf /usr/share/X11/xorg.conf.d || exit
 
