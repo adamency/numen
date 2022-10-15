@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if ! command -v arecord > /dev/null; then
+	echo 'numen requires the alsa-utils package.' > /dev/stderr
+	exit 1
+fi
+
 mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
 handler=handlers/kernel
 mic=
