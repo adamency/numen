@@ -10,7 +10,8 @@ prefixed() { [ "${1#$2}" != "$1" ]; }
 
 ydotool debug > /dev/null 2> /dev/null || {
 	ydotoold
-	kill -$$
+	echo 'numen: ydotoold failed, exiting...' 2> /dev/null
+	pkill -P $$
 } &
 
 unset caps
