@@ -6,6 +6,8 @@ model=vosk-model-small-en-us-0.15
 ! command -v unzip > /dev/null && echo 'you need unzip' && exit 1
 ! command -v wget > /dev/null && echo 'you need wget' && exit 1
 
+mkdir -p tmp && cd tmp || exit
+
 wget "https://github.com/alphacep/vosk-api/releases/download/v${version}/${vosk_file}.zip" || exit
 unzip "$vosk_file" || exit
 cp "${vosk_file}/libvosk.so" /lib || exit
