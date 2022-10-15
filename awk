@@ -1,7 +1,6 @@
 #!/bin/sh
 # A workaround to stop mawk buffering stdin.
-if [ "$(command -v awk)" = /bin/mawk ]; then
-	awk -Winteractive "$@"
-else
-	awk "$@"
-fi
+case "$(realpath "$(command -v awk)")" in
+	*/mawk) awk -Winteractive "$@";;
+	*) awk "$@";;
+esac
