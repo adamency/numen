@@ -4,6 +4,7 @@ distfile="https://github.com/ReimuNotMoe/ydotool/archive/v${version}.tar.gz"
 checksum=02311cdc608f205711b06a95e5fd71093b2294f4920efc526f5e98a2ddab42b8
 
 ! command -v cmake > /dev/null && echo 'you need cmake' && exit 1
+! command -v g++ > /dev/null && echo 'you need g++' && exit 1
 ! command -v make > /dev/null && echo 'you need make' && exit 1
 ! command -v scdoc > /dev/null && echo 'you need scdoc' && exit 1
 ! command -v tar > /dev/null && echo 'you need tar' && exit 1
