@@ -15,13 +15,13 @@ Finally, `numen` itself requires `go` (>=1.15) and can be installed with `sudo .
 ## Getting Started
 
 Once you've got a microphone, you can run it with: `numen`<br>
-Say "hoof eve yank" to type "hey", or type a sentence like "scribe \<slight pause\> so this is a sentence blah blah blah".
+You should be able to type "hey" by saying "hoof eve yank", and transcribe a sentence after saying "scribe" (you need to leave a slight pause after "scribe" for now).
 You can terminate it by pressing <kbd>Ctrl</kbd>+<kbd>c</kbd> or saying "troll cap".
 
 If nothing happened, you might need to specify the right microphone with the `--mic` option.
 See `numen --list-mics` for what's available.
 
-The default phrases are in the `/etc/numen/phrases/` directory, you could copy them to `~/.config/numen/phrases/` where you can edit them.
+The default phrases are in the `/etc/numen/phrases/` directory, and you can copy them to `~/.config/numen/phrases/` where you can edit them.
 The most important files are `phrases/characters` with the alphabet and symbols, and `phrases/control` with the modifiers, backspace and friends.
 Have a go in your text editor.
 
