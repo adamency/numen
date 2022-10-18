@@ -1,9 +1,3 @@
-# When using --gadget, switch between controlling the host or gadget.
-# The super modifier needs to be down.
-@gadget gadget:localeval [ "$NUMEN_SUPER" = 1 ] && echo handler kernel
-@gadget host:localeval [ "$NUMEN_SUPER" = 1 ] && echo handler gadget
-
-
 # These phrases are for window management but require configuration.
 
 # Focus to the window in the given direction

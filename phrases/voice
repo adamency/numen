@@ -6,7 +6,6 @@
 # Erase transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'
 
-# TODO test with --gadget
 # Menu of transcription results
 transcripts:set DISPLAY displaying\
 eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; [ -s "$f" ] && printf 'type %s\n' "$(dmenu -i -l 10 < "$f")" || notify-send 'No transcripts' & } &
