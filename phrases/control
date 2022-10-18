@@ -3,18 +3,20 @@ okay:press Return
 tab:press Tab
 @rapidoff scape:unstick press Escape
 
+# Enable a modifier for the next press
 shift:mod shift
 troll:mod ctrl
 hype:mod alt
 @rapidoff suck:mod super unstick
+# Clear modifiers
 @rapidoff forget:mod clear capsoff unstick
 
-# Turn on Caps Lock, turn it off by saying "forget".
-# The super modifier needs to be down.
+# Turn on Caps Lock (turn it off by saying "forget")
+# As a safeguard, the super modifier needs to be enabled.
 shout:localeval [ "$NUMEN_SUPER" = 1 ] && echo capson\
 mod clear
 
-# Hold down each pressed key, stop by saying "forget".
+# Start holding down each pressed key (stop it by saying "forget")
 @rapidon sticky:stick
 
 hack:press BackSpace
@@ -22,6 +24,7 @@ scrap:press BackSpace BackSpace
 toss:press Delete
 crevice:press Delete Delete
 raze:press BackSpace BackSpace BackSpace BackSpace
+# Delete a word (depending on the program)
 wipe:press ctrl+BackSpace
 
 left:press Left
@@ -39,6 +42,7 @@ reel:press Prior
 home:press Home
 end:press End
 
+# Paste the clipboard (depending on the program)
 @rapidoff pastry:unstick press XF86Paste
 
 again:repeat 1
@@ -52,6 +56,7 @@ backward:press XF86Back
 forward:press XF86Forward
 refresh:press XF86Refresh
 
-# Menu of function keys and friends
+# Menu of function keys and rare keys
+# (You can also input your own chord like ctrl+alt+f4)
 functions:set DISPLAY displaying\
 eval printf 'F1\nF2\nF3\nF4\nF5\nF6\nF7\nF8\nF9\nF10\nF11\nF12\nsterling £\nEuroSign €\nMenu\nInsert\nNum_Lock\nPrint\nScroll_Lock\nPause\n' | dmenu -i | sed -E 's/^ *([^ ]+).*/press \1/' &

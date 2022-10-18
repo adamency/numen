@@ -1,7 +1,7 @@
 # This saves your changes in vi-style text editors
 safeguard:press Escape colon w Return
 
-# You could bind these to navigate windows within apps
+# I bind these to navigate in-app windows
 fall:press alt+Down
 rise:press alt+Up
 small:press alt+Left

@@ -1,11 +1,11 @@
-# These phrases are for window management but require configuration.
+# I have the keybindings these simulate bound for window management.
 
-# Focus to the window in the given direction
+# Navigate to the window in the given direction
 @rapidoff west:unstick press super+Left
 @rapidoff east:unstick press super+Right
 @rapidoff north:unstick press super+Up
 @rapidoff south:unstick press super+Down
-# Cycle focus
+# Cycle round the windows
 @rapidoff cycle:unstick press super+c
 @rapidoff recycle:unstick press super+C
 # Close window
