@@ -3,6 +3,8 @@
 Numen is voice control for desktop computing without a keyboard or mouse.
 It works system-wide on your Linux machine.
 
+A short demonstration can be found on: [https://numen.johngebbie.com](https://numen.johngebbie.com)
+
 ## Installation From Source
 
 The standard mode requires the [ydotool](https://github.com/ReimuNotMoe/ydotool) command, which can be installed with `sudo ./install-ydotool.sh`.
