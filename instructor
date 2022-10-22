@@ -46,7 +46,7 @@ for (;;) {
 		print "key" (Sticky ? "down" : "") $0
 		fflush()
 		Prev = "press"
-		PrevPress = $0
+		PrevPress = substr($0, 2)
 		next
 	}
 
