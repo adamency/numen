@@ -17,6 +17,13 @@ function warn(msg) {
 	print "WARNING: "msg > "/dev/stderr"
 }
 
+function max(a, b) {
+	return a > b ? a : b
+}
+function min(a, b) {
+	return a < b ? a : b
+}
+
 function setmod(mod, state) {
 	Mods[mod] = state
 	system("echo "state" > "ModDir"/"m)
@@ -76,12 +83,27 @@ for (;;) {
 		next
 	}
 
-	if ($1 == "mouseto" || $1 == "mousemove") {
-		if ($2 ~ /[0-9]+/ && $3 ~ /[0-9]+/) {
-			print $1, $2, $3
+	if ($1 == "mousemove") {
+		if ($2 ~ /^[0-9.]+$/ && $3 ~ /^[0-9.]+$/) {
+			print $1, int($2), int($3)
 			fflush()
 		} else {
 			warn("invalid number: " $0)
+		}
+		$1 = $2 = $3 = ""; $0 = $0
+	}
+
+	if ($1 == "mouseto") {
+		if ($2 ~ /^[0-9.]+$/ && $3 ~ /^[0-9.]+$/) {
+			if ($2 < 0.0 || $2 > 1.0 || $3 < 0.0 || $3 > 1.0) {
+				warn("clamping percentages between 0.0 and 1.0: " $0)
+				$2 = max(0.0, min($2, 1.0))
+				$3 = max(0.0, min($3, 1.0))
+			}
+			print $1, $2, $3
+			fflush()
+		} else {
+			warn("invalid coordinate: " $0)
 		}
 		$1 = $2 = $3 = ""; $0 = $0
 	}

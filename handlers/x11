@@ -44,7 +44,10 @@ while IFS= read -r line; do
 	elif prefixed "$line" mousemove; then
 		print "mousemove_relative --${line#mousemove}"
 	elif prefixed "$line" mouseto; then
-		print "mousemove --${line#mouseto}"
+		coord="${line#* }"
+		size="$(xdotool search --maxdepth 0 --name '' getwindowgeometry)"
+		size="${size##* }"
+		awk -v w="${size%x*}" -v h="${size#*x}" -v x="${coord% *}" -v y="${coord#* }" 'BEGIN {print "mousemove -- "w*x" "h*y}'
 	elif prefixed "$line" pen; then
 		export NUMEN_TEXT="$(shell -c "${line#pen }")"
 		print "$NUMEN_TEXT" | sed "s/^/type --delay ${NUMEN_TYPE_DELAY} -- /; 1 !s/^/key --delay ${NUMEN_TYPE_DELAY} -- Return\n/"

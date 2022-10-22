@@ -74,7 +74,7 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 	Enable/disable Caps Lock.
 
 *mouseto* _X_ _Y_
-	Teleport the cursor to the _X_ _Y_ pixel coordinate.
+	Teleport the cursor to _X_ _Y_, where _X_ and _Y_ are percentages between 0.0 and 1.0.
 
 *mousemove* _X_ _Y_
 	Move the cursor _X_ _Y_ pixels relative to its current position.
