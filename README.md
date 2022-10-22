@@ -7,12 +7,14 @@ A short demonstration can be found on: [https://numen.johngebbie.com](https://nu
 
 ## Installation From Source
 
-The standard mode requires the [ydotool](https://github.com/ReimuNotMoe/ydotool) command, which can be installed with `sudo ./install-ydotool.sh`.
-(Alternatively, you might be able to install `ydotool` from your package manager, but it needs to have been packaged in such a way it doesn't require root permissions to run.)
+`go` (>=1.19) is required.
+
+The standard mode requires the [dotool](https://sr.ht/~geb/dotool) command, which can be installed with `sudo ./install-dotool.sh`.
+This also adds a udev rule so you can run it without root permissions.
 
 The [speech recognition library](https://alphacephei.com/vosk) and an english language model (about 40MB) can be installed with `sudo ./install-vosk.sh`.
 
-Finally, `numen` itself requires `go` (>=1.15) and can be installed with `sudo ./install-numen.sh`.
+Finally, `numen` itself can be installed with `sudo ./install-numen.sh`.
 
 ## Getting Started
 
