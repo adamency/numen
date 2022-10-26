@@ -8,6 +8,8 @@ alias shell='${NUMEN_SHELL:-/bin/sh}'
 # Returns whether $1 starts with $2.
 prefixed() { [ "${1#$2}" != "$1" ]; }
 
+alias dotool='{ print "keydelay 12" "typedelay 4"; cat; } | dotool'
+
 unset caps
 while IFS= read -r line; do
 	line="${line#local}"
@@ -29,7 +31,13 @@ while IFS= read -r line; do
 		shell -c "${line#eval }" > "$1"
 	elif prefixed "$line" set; then
 		line="${line#set }"
-		export -- "${line%% *}=$(shell -c "${line#* }")"
+		value="$(shell -c "${line#* }")"
+		if [ "${line%% *}" = NUMEN_KEY_DELAY ]; then
+			print "keydelay $value"
+		elif [ "${line%% *}" = NUMEN_TYPE_DELAY ]; then
+			print "typedelay $value"
+		fi
+		export -- "${line%% *}=$value"
 	elif prefixed "$line" handler; then
 		exec "handlers/${line#handler }"
 	else
