@@ -1,6 +1,9 @@
 #!/bin/sh
 
-! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && exit 1
+ok=1
+! command -v gcc > /dev/null && echo 'you need gcc' && unset ok
+! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
+[ "$ok" ] || exit
 
 # Install the numen command
 rm -rf /usr/libexec/numen && mkdir -p /usr/libexec/numen || exit
