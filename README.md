@@ -9,10 +9,11 @@ A short demonstration can be found on: [https://numen.johngebbie.com](https://nu
 
 `go` (>=1.19) is required.
 
+The [speech recognition library](https://alphacephei.com/vosk) and an english language model (about 40MB) can be installed with `sudo ./install-vosk.sh`.
+If this throws a 404 error, the Vosk team hasn't provided a binary for your architecture.
+
 The standard mode requires the [dotool](https://sr.ht/~geb/dotool) command, which can be installed with `sudo ./install-dotool.sh`.
 This also adds a udev rule so you can run it without root permissions.
-
-The [speech recognition library](https://alphacephei.com/vosk) and an english language model (about 40MB) can be installed with `sudo ./install-vosk.sh`.
 
 Finally, `numen` itself can be installed with `sudo ./install-numen.sh`.
 
