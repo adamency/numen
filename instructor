@@ -109,7 +109,7 @@ for (;;) {
 	}
 
 	if ($1 == "click") {
-		if ($2 == "left" || $2 == "right") {
+		if ($2 == "left" || $2 == "middle" || $2 == "right") {
 			print "click " $2
 			fflush()
 		} else {
