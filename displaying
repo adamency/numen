@@ -1,7 +1,12 @@
 #!/bin/sh
 if [ $# != 0 ]; then
-	echo 'displaying: Prints the $DISPLAY of the current user.' > /dev/stderr
+	echo 'displaying: Heuristically prints the active X display.' > /dev/stderr
 	[ "$1" = -h ] || [ "$1" = --help ]; exit
 fi
-console="$(cat /sys/class/tty/tty0/active)"
-w --no-header | sed -nE "s/[^ ]+ *//; s/^$console .* (:[0-9]+).*/\1/; /^:/ { p; q }"
+for p in $(pgrep -t $(cat /sys/class/tty/tty0/active)); do
+	d="$(ps e $p | sed 's/.*DISPLAY=\([^ ]*\).*/\1/; t; d')"
+	[ "$d" ] && printf %s\\n "$d" && exit
+done
+echo 'displaying: Could not determine the active X display' > /dev/stderr
+echo :0
+exit 1
