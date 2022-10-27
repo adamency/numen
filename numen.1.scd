@@ -11,13 +11,16 @@ numen(1)
 
 # DESCRIPTION
 
-*numen* reads phrases and corresponding actions from one or more files and performs the actions when you say the phrases.
+*numen* reads phrases and corresponding actions from one or more files and
+performs the actions when you say the phrases.
 
-When no files are passed as arguments, *numen* reads the files ending .phrases in *$XDG_CONFIG_HOME/numen/phrases/* else */etc/numen/phrases/*.
+When no files are passed as arguments, *numen* reads the files ending
+with .phrases in *$XDG_CONFIG_HOME/numen/phrases/* else */etc/numen/phrases/*.
 (*$XDG_CONFIG_HOME* is *~/.config* unless set otherwise.)
 
-The actions can be performed for different environments.
-By default, a virtual device is simulated at a low enough level to work in any graphical environment or virtual console.
+The actions can be performed for different environments.  By default, a
+virtual device is simulated at a low enough level to work in any graphical
+environment or virtual console.
 
 # OPTIONS
 
@@ -25,8 +28,9 @@ By default, a virtual device is simulated at a low enough level to work in any g
 	Print help and exit.
 
 *--kernel*
-	The default mode, perform the actions at a low enough level to work in any graphical environment or virtual console.
-	This might require the user to be in a specific group such as *input*.
+	The default mode, perform the actions at a low enough level to work
+	in any graphical environment or virtual console.  This might require
+	the user to be in a specific group such as *input*.
 
 *--list-mics*
 	List audio devices and exit.
@@ -35,8 +39,8 @@ By default, a virtual device is simulated at a low enough level to work in any g
 	Select the audio device.
 
 *--x11*
-	Perform the actions for an X11 graphical environment.
-	This is more limited than *--kernel* but might require less permissions.
+	Perform the actions for an X11 graphical environment.  This is more
+	limited than *--kernel* but might require less permissions.
 
 # CONFIGURATION
 
@@ -44,16 +48,16 @@ Each line of the files goes:
 
 \[*@*_TAG_...] _PHRASE_:_ACTIONS_
 
-That is, there can be zero or more "tags" each starting with *@*, then the phrase, then a *:* and the actions.
-Empty lines and lines starting with *#* are ignored.
-The *:* can be omitted if there are no actions.
+That is, there can be zero or more "tags" each starting with *@*, then the
+phrase, then a *:* and the actions.  Empty lines and lines starting with *#*
+are ignored.  The *:* can be omitted if there are no actions.
 
-Currently, the phrase must be a single word.
-The phrase must be known by the speech recognition or you'll be informed by an error.
+Currently, the phrase must be a single word.  The phrase must be known by
+the speech recognition or you'll be informed by an error.
 
-Actions can come directly after other actions that don't use the rest of the line.
-Multiple actions can be spread over multiple lines by ending each with a backslash.
-The supported actions are:
+Actions can come directly after other actions that don't use the rest of
+the line.  Multiple actions can be spread over multiple lines by ending each
+with a backslash.  The supported actions are:
 
 *press* _CHORD_ [_CHORD_...]
 	Simulate each _CHORD_, for example: *press ctrl+c Up*++
@@ -74,7 +78,8 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 	Enable/disable Caps Lock.
 
 *mouseto* _X_ _Y_
-	Teleport the cursor to _X_ _Y_, where _X_ and _Y_ are percentages between 0.0 and 1.0.
+	Teleport the cursor to _X_ _Y_, where _X_ and _Y_ are percentages
+	between 0.0 and 1.0.
 
 *mousemove* _X_ _Y_
 	Move the cursor _X_ _Y_ pixels relative to its current position.
@@ -86,71 +91,80 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 	Simulate scrolling a mouse wheel.
 
 *stick*
-	Make presses not keyup until *unstick*, like holding down a key at a time.
-	If already sticking, keyup but keep sticking.
+	Make presses not keyup until *unstick*, like holding down a key at
+	a time.  If already sticking, keyup but keep sticking.
 
 *unstick*
 	Keyup and stop sticking.
 
 *repeat* _NUMBER_
-	Repeat the previous *press*/*pen* that _NUMBER_ of times.
+	Repeat the previous *press*/*pen* the _NUMBER_ of times.
 
 *pen* _COMMAND_
 	Execute the rest of the line in the shell and type any stdout.
 	An example that types the date: *pen date +%D*
 
 *eval* _COMMAND_
-	Reinterpret the rest of the line as the stdout it produces when shell evaluated.
-	An example that backspaces the previously typed text:++
+	Reinterpret the rest of the line as the stdout it produces when shell
+	evaluated.  An example that backspaces the previously typed text:++
 *eval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'*
 
 *set* _ENVIRONMENT_VARIABLE_ _COMMAND_
-	Set _ENVIRONMENT_VARIABLE_ to the stdout the rest of the line produces when shell evaluated.
-	An example that tweaks *numen*:++
+	Set _ENVIRONMENT_VARIABLE_ to the stdout the rest of the line produces
+	when shell evaluated.  An example that tweaks *numen*:++
 *set NUMEN_TYPE_DELAY echo 20*
 
 *handler* *kernel*/*x11*
 	Change between the *--kernel* and *--x11* modes.
 
-Tags have phrases act specially.
-Unsupported tags are silently ignored.
+Tags have phrases act specially.  Unsupported tags are silently ignored.
 The supported tags are:
 
 *@instant*
-	If the phrase seems to have been said, instead of waiting till the sentence is finished and finalized, perform the sentence so far.
+	If the phrase seems to have been said, instead of waiting till the
+	sentence is finished and finalized, perform the sentence so far.
 
 *@cancel*
-	Cancel the sentence.
-	Note without *@instant* preceding words are still performed, but with *@instant* proceeding words are still performed.
+	Cancel the sentence.  Note without *@instant* preceding words are still
+	performed, but with *@instant* proceeding words are still performed.
 
 *@transcribe*
 	Type the rest of the sentence literally.
 
 *@rapidon*
-	Act as if all phrases are tagged with *@instant* until a phrase tagged *@rapidoff*.
-	Useful to shorten the response time in *sticky* mode, but reduces recognition accuracy.
+	Act as if all phrases are tagged with *@instant* until a phrase
+	tagged *@rapidoff*.  Useful to shorten the response time in *sticky*
+	mode, but reduces recognition accuracy.
 
 *@kernel* *@x11*
-	Only listen for the phrase if performing the actions using one of the tagged modes.
+	Only listen for the phrase if performing the actions using one of
+	the tagged modes.
 
 # ENVIRONMENT VARIABLES
 
-*numen* can be tweaked by some environment variables, which can even be set by the *set* action:
+*numen* can be tweaked by some environment variables, which can even be set
+by the *set* action:
 
 - *NUMEN_SHELL* sets the shell used for *pen* and *eval* actions.
 - *NUMEN_TYPE_DELAY* sets the keystroke delay of the *type* and *pen* actions.
 - *NUMEN_KEY_DELAY* sets the keystroke delay of the *press* action.
 
-When *numen* executes a shell command, it provides some environment variables exposing *numen*'s state:
+When *numen* executes a shell command, it provides some environment variables
+exposing *numen*'s state:
 
-- *NUMEN_HANDLER* is *kernel* or *x11* depending on which mode the actions are being performed.
+- *NUMEN_HANDLER* is *kernel* or *x11* depending on which mode the actions
+  are being performed.
 - *NUMEN_TEXT* is the last *type*/*pen* text.
-- *NUMEN_SUPER* *NUMEN_CTRL* *NUMEN_ALT* *NUMEN_SHIFT* are either *0* or *1* describing each modifier's state.
+- *NUMEN_SUPER*, *NUMEN_CTRL*, *NUMEN_ALT* and *NUMEN_SHIFT* are either *0*
+  or *1* describing each modifier's state.
 
 # DATA FILES
 
-- The file *$XDG_DATA_HOME/numen/transcripts* is overwritten to the latest transcription results.
-- The directory *$XDG_DATA_HOME/numen/mods/* has files of the state of each modifier, containing either *0* or *1*.
+The file *$XDG_DATA_HOME/numen/transcripts* is overwritten to the latest
+transcription results.
+
+The directory *$XDG_DATA_HOME/numen/mods/* has files of the state of each
+modifier, containing either *0* or *1*.
 
 (*$XDG_DATA_HOME* is *~/.local/share/* unless set otherwise.)
 
@@ -160,8 +174,9 @@ Run *numen* using the default phrases in */etc/numen/phrases/*:
 
 	*numen*
 
-You can try saying "hoof eve yank" and "scribe <slight pause> so this is a sentence" into your microphone,
-and terminate it by pressing *ctrl*+*c* or saying "troll cap".
+You can try saying "hoof eve yank" and "scribe, so this is a sentence"
+into your microphone, and terminate it by pressing *Ctrl*+*c* or saying
+"troll cap".
 
 # AUTHOR
 
