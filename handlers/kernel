@@ -8,7 +8,7 @@ alias shell='${NUMEN_SHELL:-/bin/sh}'
 # Returns whether $1 starts with $2.
 prefixed() { [ "${1#$2}" != "$1" ]; }
 
-alias dotool='{ print "keydelay 12" "typedelay 4"; cat; } | dotool'
+alias dotool='{ print "keydelay 8" "typedelay 4"; cat; } | dotool'
 
 unset caps
 while IFS= read -r line; do
