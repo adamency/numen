@@ -40,7 +40,11 @@ while IFS= read -r line; do
 	elif [ "$line" = capsoff ]; then
 		iscapson && print "key --delay ${NUMEN_KEY_DELAY:-4} Caps_Lock"
 	elif prefixed "$line" click; then
-		print "$line" | sed 's/left/1/; s/middle/2/; s/right/3/; s/scrollup/4/; s/scrolldown/5/'
+		print "$line" | sed 's/left/1/; s/middle/2/; s/right/3/'
+	elif [ "$line" = scrollup ]; then
+		print 'click 4'
+	elif [ "$line" = scrolldown ]; then
+		print 'click 5'
 	elif prefixed "$line" mousemove; then
 		print "mousemove_relative --${line#mousemove}"
 	elif prefixed "$line" mouseto; then

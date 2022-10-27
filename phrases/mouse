@@ -5,8 +5,8 @@
 index:click left
 
 # Scroll
-explicate:click scrollup
-implicate:click scrolldown
+explicate:scrollup
+implicate:scrolldown
 
 # Center the cursor in the active window
 center:eval printf 'mouseto '; xdotool getactivewindow getwindowgeometry | awk '{sub(/[,x]/, " ")}; NR==2 {x=$2;y=$3}; NR==3 {print x+($2)/2, y+($3)/2}'

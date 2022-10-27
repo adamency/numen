@@ -24,6 +24,10 @@ while IFS= read -r line; do
 	elif [ "$line" = capsoff ]; then
 		[ "$caps" ] && print "key capslock"
 		unset caps
+	elif [ "$line" = scrollup ]; then
+		print 'scroll -1'
+	elif [ "$line" = scrolldown ]; then
+		print 'scroll 1'
 	elif prefixed "$line" pen; then
 		export NUMEN_TEXT="$(shell -c "${line#pen }")"
 		print "$NUMEN_TEXT" | sed 's/^/type /; 1 !s/^/key Return\n/'

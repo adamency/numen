@@ -79,8 +79,11 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 *mousemove* _X_ _Y_
 	Move the cursor _X_ _Y_ pixels relative to its current position.
 
-*click* *left*/*middle*/*right*/*scrollup*/*scrolldown*
+*click* *left*/*middle*/*right*
 	Simulate a mouse click.
+
+*scrollup*/*scrolldown*
+	Simulate scrolling a mouse wheel.
 
 *stick*
 	Make presses not keyup until *unstick*, like holding down a key at a time.

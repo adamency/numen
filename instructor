@@ -109,13 +109,18 @@ for (;;) {
 	}
 
 	if ($1 == "click") {
-		if ($2 == "left" || $2 == "right" || $2 == "scrollup" || $2 == "scrolldown") {
+		if ($2 == "left" || $2 == "right") {
 			print "click " $2
 			fflush()
 		} else {
 			warn("invalid mouse button: " $0)
 		}
 		$1 = $2 = ""; $0 = $0
+	}
+
+	if ($1 == "scrollup" || $1 == "scrolldown") {
+		print $1
+		$1 = ""; $0 = $0
 	}
 
 	if (sub(/^[ \t]*pen[ \t]/, "")) {
