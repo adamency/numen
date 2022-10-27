@@ -3,6 +3,7 @@
 ok=1
 ! command -v gcc > /dev/null && echo 'you need gcc' && unset ok
 ! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
+! command -v scdoc > /dev/null && echo 'you need scdoc' && unset ok
 [ "$ok" ] || exit
 
 # Install the numen command
@@ -25,8 +26,8 @@ chmod +x /usr/local/bin/numen || exit
 mkdir -p /etc/numen && rm -rf /etc/numen/phrases && cp -r phrases /etc/numen || exit
 # Install the displaying command used in the default phrases
 cp displaying /usr/local/bin || exit
-# Install the manpage if the scdoc command is installed
-command -v scdoc > /dev/null && scdoc < numen.1.scd > /usr/share/man/man1/numen.1
+# Install the manpage
+scdoc < doc/numen.1.scd > /usr/share/man/man1/numen.1
 
 # not necessary but lets you run ./numen in this directory
 ln -sf /usr/local/share/vosk-models/small-en-us model
