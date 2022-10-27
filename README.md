@@ -33,8 +33,8 @@ If nothing happened, you might need to specify the right microphone with the
 
 The default phrases are in the `/etc/numen/phrases/` directory, and you can
 copy them to `~/.config/numen/phrases/` where you can edit them.  The most
-important files are `phrases/characters` with the alphabet and symbols, and
-`phrases/control` with the modifiers, backspace and friends.  Have a go in
+important files are `character.phrases` with the alphabet and symbols, and
+`control.phrases` with the modifiers, backspace and friends.  Have a go in
 your text editor.
 
 ## Going Further

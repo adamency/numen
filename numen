@@ -28,9 +28,9 @@ done
 
 if [ $# = 0 ]; then
 	if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}"/numen/phrases ]; then
-		set -- $(find "${XDG_CONFIG_HOME:-$HOME/.config}"/numen/phrases/ -maxdepth 1 \! -type d)
+		set -- "${XDG_CONFIG_HOME:-$HOME/.config}/numen/phrases/"*.phrases
 	else
-		set -- $(find /etc/numen/phrases/ -maxdepth 1 \! -type d)
+		set -- /etc/numen/phrases/*.phrases
 	fi
 fi
 

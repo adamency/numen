@@ -13,7 +13,7 @@ numen(1)
 
 *numen* reads phrases and corresponding actions from one or more files and performs the actions when you say the phrases.
 
-When no files are passed as arguments, *numen* reads the files in *$XDG_CONFIG_HOME/numen/phrases/* else */etc/numen/phrases/*.
+When no files are passed as arguments, *numen* reads the files ending .phrases in *$XDG_CONFIG_HOME/numen/phrases/* else */etc/numen/phrases/*.
 (*$XDG_CONFIG_HOME* is *~/.config* unless set otherwise.)
 
 The actions can be performed for different environments.

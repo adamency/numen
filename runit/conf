@@ -3,4 +3,10 @@
 # NUMENUSER=john
 # export XAUTHORITY="/run/user/$(id -u $NUMENUSER)/Xauthority"
 # export XDG_DATA_HOME="/home/$NUMENUSER/.local/share"
-# OPTS=$(find "/home/$NUMENUSER/.config/numen/phrases/" -maxdepth 1 \! -type d)
+# OPTS=$(
+# 	if [ -d /home/$NUMENUSER/.config/numen/phrases ]; then
+# 		printf %s\\n /home/$NUMENUSER/.config/numen/phrases/*.phrases
+# 	else
+# 		printf %s\\n /etc/numen/phrases/*.phrases
+# 	fi
+# )
