@@ -1,7 +1,9 @@
 # Cancel sentence
+# For example, "four down no five down" would just do "five down".
 @instant @cancel no
 
 # Transcribe sentence
+# For example, "scribe, please type this".
 @instant @transcribe scribe
 # Erase transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'

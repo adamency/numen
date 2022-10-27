@@ -1,4 +1,6 @@
 # I have the keybindings these simulate bound for window management.
+# They likely won't do anything out of the box.
+# You can get my desktop environment at: https://git.sr.ht/~geb/tiles
 
 # Navigate to the window in the given direction
 @rapidoff west:unstick press super+Left

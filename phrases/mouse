@@ -5,6 +5,7 @@
 index:click left
 
 # Scroll
+# (I only use these as a last resort, like on a webpage where "page", "reel", "up" and "down" don't work)
 explicate:scrollup
 implicate:scrolldown
 
