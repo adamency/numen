@@ -28,6 +28,7 @@ func strings_Cut(s, sep string) (before, after string, found bool) {
 }
 
 func fatal(v ...interface{}) {
+	fmt.Fprint(os.Stderr, "numen: ")
 	fmt.Fprintln(os.Stderr, v...)
 	os.Exit(1)
 }
@@ -64,7 +65,7 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			if len(action) > 0 {
 				for []rune(action)[len([]rune(action))-1] == '\\' {
 					if !sc.Scan() {
-						fatal("unexpected end of file")
+						fatal(f.Name() + ": unexpected end of file")
 					}
 					action = action[:len(action)-1] + "\n" + sc.Text()
 				}
@@ -74,22 +75,22 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			}
 			fields := strings.Fields(phrase)
 			if len(fields) == 0 {
-				fatal("line missing phrase: " + sc.Text())
+				fatal(f.Name() + ": line missing phrase: " + sc.Text())
 			}
 			phrase = fields[len(fields)-1]
 			tags := fields[:len(fields)-1]
 			for i := range tags {
 				if tags[i][0] != '@' {
-					fatal("currently only one-word phrases are supported: " + sc.Text())
+					fatal(f.Name() + ": currently only one-word phrases are supported: " + sc.Text())
 				}
 				tags[i] = tags[i][1:]
 			}
 			if !known(phrase) {
-				fatal("phrase not in the vocabulary:", phrase)
+				fatal(f.Name() + ": phrase not in the vocabulary: " + phrase)
 			}
 			if !skip(tags) {
 				if _, found := get(commands, phrase); found {
-					fatal("phrase already defined:", phrase)
+					fatal(f.Name() + ": phrase already defined: " + phrase)
 				}
 				commands = append(commands, Command{phrase, tags, action})
 			}
