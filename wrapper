@@ -1,0 +1,12 @@
+#!/bin/sh
+cd /usr/libexec/numen || exit
+if [ -z "$NUMEN_MODEL" ]; then
+	if [ -e /usr/local/share/vosk-models/small-en-us ]; then
+		export NUMEN_MODEL=/usr/local/share/vosk-models/small-en-us
+	elif [ -e /usr/share/vosk-models/small-en-us ]; then
+		export NUMEN_MODEL=/usr/share/vosk-models/small-en-us
+	else
+		echo 'numen: You need to install the vosk-model-small-en-us package or set $NUMEN_MODEL.' > /dev/stderr
+	fi
+fi
+exec ./numen "$@"
