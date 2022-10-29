@@ -6,7 +6,7 @@ if [ -z "$NUMEN_MODEL" ]; then
 	elif [ -e /usr/share/vosk-models/small-en-us ]; then
 		export NUMEN_MODEL=/usr/share/vosk-models/small-en-us
 	else
-		echo 'numen: You need to install the vosk-model-small-en-us package or set $NUMEN_MODEL.' > /dev/stderr
+		echo 'numen: You need to install the vosk-model-small-en-us package or set $NUMEN_MODEL.' >&2
 	fi
 fi
 exec ./numen "$@"

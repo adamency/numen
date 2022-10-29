@@ -58,6 +58,6 @@ If you are not in group input, you can add yourself by running:
 	sudo usermod -a -G input $USER
 
 and then re-login.
-' > /dev/stderr
+' >&2
 	fi
 fi
