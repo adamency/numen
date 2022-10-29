@@ -72,29 +72,17 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			if !found {
 				phrase, _, _ = strings_Cut(phrase, "#")
 			}
-			phrase = strings.Replace(phrase, "\t", " ", -1)
-			var tags []string
-			for {
-				if []rune(phrase)[0] == '@' {
-					phrase = phrase[1:]
-					if len(phrase) == 0 {
-						continue
-					}
-					tag, after, found := strings_Cut(phrase, " ")
-					if found {
-						phrase = after
-					}
-					tags = append(tags, tag)
-				} else {
-					i := strings.IndexRune(phrase, ' ')
-					if i == -1 {
-						break
-					}
-					phrase = phrase[i+1:]
-				}
+			fields := strings.Fields(phrase)
+			if len(fields) == 0 {
+				fatal("line missing phrase: " + sc.Text())
 			}
-			if strings.ContainsRune(phrase, ' ') {
-				fatal("currently only single word phrases are supported:", phrase)
+			phrase = fields[len(fields)-1]
+			tags := fields[:len(fields)-1]
+			for i := range tags {
+				if tags[i][0] != '@' {
+					fatal("currently only one-word phrases are supported: " + sc.Text())
+				}
+				tags[i] = tags[i][1:]
 			}
 			if !known(phrase) {
 				fatal("phrase not in the vocabulary:", phrase)
