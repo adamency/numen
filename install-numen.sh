@@ -1,9 +1,12 @@
 #!/bin/sh
 
 ok=1
+! command -v arecord > /dev/null && echo 'you need the alsa-utils package' && unset ok
+! command -v dmenu > /dev/null && echo 'you need dmenu' && unset ok
 ! command -v gcc > /dev/null && echo 'you need gcc' && unset ok
 ! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
 ! command -v scdoc > /dev/null && echo 'you need scdoc' && unset ok
+! command -v xdotool > /dev/null && echo 'you need xdotool' && unset ok
 [ "$ok" ] || exit
 
 # Install the numen command
