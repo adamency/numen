@@ -34,16 +34,18 @@ if [ $# = 0 ]; then
 	fi
 fi
 
+unset tmpdir
+trap 'rm -rf "$tmpdir"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
+
 if [ "$NUMEN_PIPE" ]; then
 	pipe="$NUMEN_PIPE"
 else
 	tmpdir="$(mktemp -d)"
-	trap 'rm -rf "$tmpdir"' EXIT INT TERM HUP
 	pipe="$tmpdir/pipe"
 	mkfifo -m 600 "$pipe" || exit
-
 	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
 fi
 
 export NUMEN_HANDLER="${handler#*/}"
-./instructor < "$pipe" | "$handler" "$pipe"
+./instructor < "$pipe" | "$handler" "$pipe" &
+wait
