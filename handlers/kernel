@@ -47,4 +47,17 @@ while IFS= read -r line; do
 	else
 		print "$line"
 	fi
-done | dotool
+done | if ! dotool; then
+	if ! : | dotool 2> /dev/null; then
+		echo 'numen: Failed to create the input device, you might not have the permissions.
+Make sure you are in group input (see: id -Gn) and run: sudo udevadm trigger
+The command reloads the udev rule installed with numen, alternatively you can reboot.
+
+If you are not in group input, you can add yourself by running:
+
+	sudo usermod -a -G input $USER
+
+and then re-login.
+' > /dev/stderr
+	fi
+fi

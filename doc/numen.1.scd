@@ -28,9 +28,11 @@ environment or virtual console.
 	Print help and exit.
 
 *--kernel*
-	The default mode, perform the actions at a low enough level to work
-	in any graphical environment or virtual console.  This might require
-	the user to be in a specific group such as *input*.
+	The default mode, perform the actions at a low enough level to work in
+	any graphical environment or virtual console.  This requires permission
+	to */dev/uinput* which the udev rule installed with numen grants to
+	users in group *input*.  If you just installed numen, you can make the
+	rule effective without rebooting by running: *sudo udevadm trigger*.
 
 *--list-mics*
 	List audio devices and exit.
@@ -40,7 +42,7 @@ environment or virtual console.
 
 *--x11*
 	Perform the actions for an X11 graphical environment.  This is more
-	limited than *--kernel* but might require less permissions.
+	limited than *--kernel* but requires less permissions.
 
 # CONFIGURATION
 
