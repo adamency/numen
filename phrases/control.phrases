@@ -57,7 +57,7 @@ forward:press XF86Forward
 refresh:press XF86Refresh
 
 # Menu of function keys and rare keys
-# (You can also input your own chord like ctrl+alt+f4)
-# (Requires the dmenu command)
+# (You can also input your own chord like ctrl+alt+F4)
+# (Requires the dmenu and xdotool commands)
 functions:set DISPLAY displaying\
-eval printf 'F1\nF2\nF3\nF4\nF5\nF6\nF7\nF8\nF9\nF10\nF11\nF12\nsterling £\nEuroSign €\nMenu\nInsert\nNum_Lock\nPrint\nScroll_Lock\nPause\n' | dmenu -i | sed -E 's/^ *([^ ]+).*/press \1/' &
+eval xdotool key -- "$(printf 'F1\nF2\nF3\nF4\nF5\nF6\nF7\nF8\nF9\nF10\nF11\nF12\nsterling £\nEuroSign €\nMenu\nInsert\nNum_Lock\nPrint\nScroll_Lock\nPause\n' | dmenu -i | sed 's/^ *//; s/ .*//')" &
