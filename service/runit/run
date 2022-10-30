@@ -2,6 +2,10 @@
 exec 2>&1
 [ -r ./conf ] && . ./conf
 : ${NUMENUSER:=_numen}
-mkdir -p /usr/share/numen
-chown $NUMENUSER:$NUMENUSER /usr/share/numen || exit
-XDG_DATA_HOME="${XDG_DATA_HOME:-/usr/share}" exec chpst -u $NUMENUSER:input:audio /usr/local/bin/numen ${OPTS}
+: ${NUMENGROUP:=_numen}
+if [ -z "$DATA_HOME" ]; then
+	DATA_HOME=/usr/share
+	rm -rf "$DATA_HOME/numen" && mkdir -p "$DATA_HOME/numen"
+	chown "$NUMENUSER:$NUMENGROUP" "$DATA_HOME/numen"
+fi
+XDG_DATA_HOME="$DATA_HOME" exec chpst -u "$NUMENUSER:$NUMENGROUP:input:audio" numen ${OPTS}
