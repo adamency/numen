@@ -8,9 +8,23 @@ alias shell='${NUMEN_SHELL:-/bin/sh}'
 # Returns whether $1 starts with $2.
 prefixed() { [ "${1#$2}" != "$1" ]; }
 
+# $1 is the fallback if keyboard LEDs can't be queried.
+iscapson() {
+	if states="$(cat /sys/class/leds/input*::capslock/brightness 2> /dev/null)"; then
+		set -- "$(print "$states" | awk '{ sum += $0 }; END { print sum != 0 }')"
+	fi
+	[ "$1" = 1 ]; return
+}
+iscapsoff() {
+	if states="$(cat /sys/class/leds/input*::capslock/brightness 2> /dev/null)"; then
+		set -- "$(print "$states" | awk '{ sum += $0 }; END { print sum != 0 }')"
+	fi
+	[ "$1" != 1 ]; return
+}
+
 alias dotool='{ print "keydelay 8" "typedelay 4"; cat; } | dotool'
 
-unset caps
+caps=0
 while IFS= read -r line; do
 	line="${line#local}"
 	if prefixed "$line" key; then
@@ -19,11 +33,9 @@ while IFS= read -r line; do
 		export NUMEN_TEXT="${line#type }"
 		print "$line"
 	elif [ "$line" = capson ]; then
-		[ "$caps" ] || print "key capslock"
-		caps=1
+		iscapsoff "$caps" && caps=1 && echo 'key capslock'
 	elif [ "$line" = capsoff ]; then
-		[ "$caps" ] && print "key capslock"
-		unset caps
+		iscapson "$caps" && caps=0 && echo 'key capslock'
 	elif [ "$line" = scrollup ]; then
 		print 'scroll -1'
 	elif [ "$line" = scrolldown ]; then
