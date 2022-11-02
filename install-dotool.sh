@@ -21,8 +21,4 @@ tar xf dotool.tar.gz || exit
 cd "dotool-${version}" || exit
 ./install.sh || exit
 
-# Allow your user to run dotool without root permissions
-echo KERNEL==\"uinput\", GROUP=\"$(logname)\", MODE:=\"0660\" > /etc/udev/rules.d/80-dotool-$(logname).rules
-udevadm trigger
-
 echo 'Installed successfully.'

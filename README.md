@@ -16,10 +16,19 @@ If this throws a 404 error, the Vosk team hasn't provided a binary for
 your architecture.
 
 The standard mode requires the [dotool](https://sr.ht/~geb/dotool) command,
-which can be installed with `sudo ./install-dotool.sh`.  This also adds a
-udev rule so you can run it without root permissions.
+which can be installed with `sudo ./install-dotool.sh`.
 
 Finally, `numen` itself can be installed with `sudo ./install-numen.sh`.
+
+## Permission
+
+The standard mode requires permission to /dev/uinput to create the virtual
+input device.  This permission is granted to users in group input, which
+your user is likely in already.
+
+If numen does complain about permission, you could give your user permission
+by running:<br>
+	`sudo ./install-user-udev-rule.sh`
 
 ## Getting Started
 
