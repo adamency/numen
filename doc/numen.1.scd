@@ -131,7 +131,11 @@ The supported tags are:
 	performed, but with *@instant* proceeding words are still performed.
 
 *@transcribe*
-	Type the rest of the sentence literally.
+	Instead of performing phrases, listen till the end of the sentence,
+	then set the environment variable *NUMEN_TRANSCRIPT* to the speech
+	recognition result and perform the action.  An example that would
+	transcribe the rest of the sentence uppercase:++
+*@instant @transcribe scream:pen echo $NUMEN_TRANSCRIPT | tr '[:lower:]' '[:upper:]'*
 
 *@rapidon*
 	Act as if all phrases are tagged with *@instant* until a phrase
@@ -157,6 +161,7 @@ exposing *numen*'s state:
 - *NUMEN_HANDLER* is *kernel* or *x11* depending on which mode the actions
   are being performed.
 - *NUMEN_TEXT* is the last *type*/*pen* text.
+- *NUMEN_TRANSCRIPT* is the literal sentence from a *@transcribe* phrase.
 - *NUMEN_SUPER*, *NUMEN_CTRL*, *NUMEN_ALT* and *NUMEN_SHIFT* are either *0*
   or *1* describing each modifier's state.
 

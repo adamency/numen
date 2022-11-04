@@ -137,34 +137,40 @@ func getTranscripts(json string) []string {
 	return s.Alternatives
 }
 
-type Event int
+type EventType int
 const (
-	ResetEvent Event = iota
+	ResetEvent EventType = iota
 	TranscribeEvent
 	RapidOnEvent
 	RapidOffEvent
 )
+type Event struct {
+	Type EventType
+	Content interface{}
+}
 
 func handleFinalized(cmds []Command, phrases []string) []Event {
 	var events []Event
 	for _, p := range phrases {
 		c, _ := get(cmds, p)
+		action := c.Action
 		var e []Event
 		for _, t := range c.Tags {
 			switch t {
 			case "cancel":
-				fmt.Println(c.Action)
+				fmt.Println(action)
 				return e
 			case "transcribe":
-				e = append(e, TranscribeEvent)
+				 e = append(e, Event{TranscribeEvent, action})
+				 action = ""
 			case "rapidon":
-				e = append(e, RapidOnEvent)
+				e = append(e, Event{RapidOnEvent, nil})
 			case "rapidoff":
-				e = append(e, RapidOffEvent)
+				e = append(e, Event{RapidOffEvent, nil})
 			}
 		}
 		events = append(events, e...)
-		fmt.Println(c.Action)
+		fmt.Println(action)
 	}
 	return events
 }
@@ -186,10 +192,10 @@ func handleUnfinalized(cmds []Command, phrases []string, rapid bool) []Event {
 	if instant || rapid {
 		if cancel {
 			handleFinalized(cmds, []string{phrases[len(phrases)-1]})
-			return []Event{ResetEvent}
+			return []Event{Event{ResetEvent, nil}}
 		}
 		events := handleFinalized(cmds, phrases)
-		return append(events, ResetEvent)
+		return append(events, Event{ResetEvent, nil})
 	}
 	return nil
 }
@@ -262,6 +268,7 @@ func main() {
 
 	commanding := true
 	rapid := false
+	var transcriptAction string
 	for {
 		_, err :=  io.ReadFull(r, buf)
 		if err != nil {
@@ -281,11 +288,12 @@ func main() {
 			}
 
 			for _, e := range events {
-				switch e {
+				switch e.Type {
 				case ResetEvent:
 					reset(cmdRec)
 				case TranscribeEvent:
 					commanding = false
+					transcriptAction = e.Content.(string)
 				case RapidOnEvent:
 					rapid = true
 				case RapidOffEvent:
@@ -297,6 +305,7 @@ func main() {
 				for i, t := range getTranscripts(transRec.Result()) {
 					fmt.Printf("transcript%d:%s\n", i+1, t)
 				}
+				fmt.Println(transcriptAction)
 				reset(cmdRec)
 				commanding = true
 			}

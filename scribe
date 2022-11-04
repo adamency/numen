@@ -5,6 +5,6 @@ BEGIN {
 	f = ENVIRON["HOME"]"/.local/share/numen/transcripts"
 	if (length(ENVIRON["XDG_DATA_HOME"])) f = ENVIRON["XDG_DATA_HOME"]"/numen/transcripts"
 }
-/^transcript1[^0-9]/ { erase(f); close(f); print "type "substr($0, 13); fflush() }
+/^transcript1[^0-9]/ { erase(f); close(f); print "set NUMEN_TRANSCRIPT echo \""substr($0, 13)"\""; fflush() }
 /^transcript/ { sub(/^[^:]*:/, ""); print > f; fflush(f); next }  # Note > appends after the first time until close
 { print; fflush() }

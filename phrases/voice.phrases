@@ -2,11 +2,17 @@
 # For example, "four down no five down" would just do "five down".
 @instant @cancel no
 
-# Transcribe sentence
+# Transcribe a sentence
 # For example, "scribe, please type this".
-@instant @transcribe scribe
-# Erase transcription
-nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'
+@instant @transcribe scribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g"
+# Transcribe a sentence with the first letter uppercase
+@instant @transcribe transcribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g" | awk '{print toupper(substr($0,1,1))substr($0,2)}'
+
+# Erase the transcription
+nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
+# Select the transcription like with a mouse (depending on the application)
+# (To use with Vim, see https://git.sr.ht/~geb/numen/tree/master/item/extras/select.vim)
+select:eval echo set NUMEN_KEY_DELAY echo 1; awk -v n=${#NUMEN_TEXT} 'BEGIN {printf "press"; for(;n--;) printf " shift+Left"; print ""}'; echo set NUMEN_KEY_DELAY echo $((NUMEN_KEY_DELAY))
 
 # Menu of transcription results
 # (Requires the dmenu command)
@@ -15,4 +21,4 @@ eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; [ -s "$f" ] &
 # Menu to change transcription result
 # (Requires the dmenu command)
 change:set DISPLAY displaying\
-eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; if [ "$(wc -l < "$f")" -gt 1 ]; then t="$(tail -n +2 "$f" | dmenu -i -l 10)" && awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}' && printf %s\\n "type $t"; else notify-send 'No alternative transcripts' & fi } &
+eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; if [ "$(wc -l < "$f")" -gt 1 ]; then t="$(tail -n +2 "$f" | dmenu -i -l 10)" && awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}' && printf %s\\n "type $t"; else notify-send 'No alternative transcripts' & fi } &
