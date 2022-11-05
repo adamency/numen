@@ -32,10 +32,10 @@ by running:<br>
 
 ## Getting Started
 
-Once you've got a microphone, you can run it with: `numen`<br> You should be
-able to type "hey" by saying "hoof eve yank", and transcribe a sentence after
-saying "scribe" (you need to leave a slight pause after "scribe" for now).
-You can terminate it by pressing Ctrl+c or saying "troll cap".
+Once you've got a microphone, you can run it with: `numen`<br> You should
+be able to type "hey" by saying "hoof eve yank", and transcribe a sentence
+after saying "scribe".  You can terminate it by pressing Ctrl+c or saying
+"troll cap".
 
 If nothing happened, you might need to specify the right microphone with the
 `--mic` option.  See `numen --list-mics` for what's available.

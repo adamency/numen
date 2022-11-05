@@ -1,7 +1,6 @@
 // sr MODEL_DIR PHRASE_FILE [PHRASE_FILE...]
 package main
 
-// TODO Carry over audio when switching recognizers.
 // TODO Confidence threshold for @instant words.
 
 import (
@@ -294,6 +293,9 @@ func main() {
 				case TranscribeEvent:
 					commanding = false
 					transcriptAction = e.Content.(string)
+					// Seems partials are output the audio chunk after they end,
+					// so we should feed it to the other recognizer.
+					transRec.AcceptWaveform(buf)
 				case RapidOnEvent:
 					rapid = true
 				case RapidOffEvent:

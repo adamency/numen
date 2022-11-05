@@ -181,9 +181,8 @@ Run *numen* using the default phrases in */etc/numen/phrases/*:
 
 	*numen*
 
-You can try saying "hoof eve yank" and "scribe, so this is a sentence"
-into your microphone, and terminate it by pressing *Ctrl*+*c* or saying
-"troll cap".
+You can try saying "hoof eve yank" and "scribe so this is a sentence" into
+your microphone, and terminate it by pressing *Ctrl*+*c* or saying "troll cap".
 
 # AUTHOR
 
