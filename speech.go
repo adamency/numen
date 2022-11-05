@@ -1,4 +1,4 @@
-// sr MODEL_DIR PHRASE_FILE [PHRASE_FILE...]
+// speech MODEL_DIR PHRASE_FILE [PHRASE_FILE...]
 package main
 
 // TODO Confidence threshold for @instant words.
