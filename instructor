@@ -43,6 +43,9 @@ for (;;) {
 		sub(/[ \t]+$/, "")
 		gsub(/[ \t]+/, " "modstr())
 		for (m in Mods) setmod(m, 0)
+		if (Sticky && length(PrevPress)) {
+			print "keyup " PrevPress
+		}
 		print "key" (Sticky ? "down" : "") $0
 		fflush()
 		Prev = "press"
