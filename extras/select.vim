@@ -9,25 +9,29 @@ inoremap <S-Right> <Esc>lv
 vnoremap <S-Right> l
 
 " These let you format your selection.
-" For example, "minus cap" makes your selection camelCase.
+" For example, "score cap" makes your selection camelCase.
 
-" a, kind, of, list, case
-vnoremap <silent> -, :s/\%V /, /g<CR>
 " kebab-case
-vnoremap <silent> -- :s/\%V /-/g<CR>
+vnoremap <silent> _- :s/\%V /-/g<CR>`>a
 " dot.case
-vnoremap <silent> -. :s/\%V /./g<CR>
+vnoremap <silent> _. :s/\%V /./g<CR>`>a
 " colon::case
-vnoremap <silent> -: :s/\%V /::/g<CR>
+vnoremap <silent> _: <Esc>`>a <Esc>:s/\%V /::/g<CR>`<f s
 " snake_case
-vnoremap <silent> -_ :s/\%V /_/g<CR>
+vnoremap <silent> __ :s/\%V /_/g<CR>`>a
 " UPPER_SNAKE_CASE
-vnoremap <silent> -u :s/\%V./\u&/g <bar> s/\%V /_/g<CR>
+vnoremap <silent> _u :s/\%V./\u&/g <bar> s/\%V /_/g<CR>`>a
 " camelCase
-vnoremap <silent> -c :s/\%V \?\<\(.\)/\u\1/g<CR>
+vnoremap <silent> _c <Esc>`>a <Esc>:s/\%V \<\(.\)/\u\1/g<CR>`<f s
 " MixedCase
-vnoremap <silent> -m :s/\%V.\zs \?\<\(.\)/\u\1/g<CR>
+vnoremap <silent> _m <Esc>`>a <Esc>:s/\%V \?\<\(.\)/\u\1/g<CR>`<f s
 " Title Case
-vnoremap <silent> -t :s/\%V\<./\u&/g<CR>
+vnoremap <silent> _t :s/\%V\<./\u&/g<CR>`>a
 " allsmashedtogether
-vnoremap <silent> -<space> :s/\%V //g<CR>
+vnoremap <silent> _<space> <Esc>`>a <Esc>:s/\%V //g<CR>`<f s
+" a, kind, of, list, case
+vnoremap <silent> _, <Esc>`>a  <Esc>:s/\%V /, /g<CR>`>/  <CR>2s
+" "a", "kind", "of", "quoted", "list", "case"
+vnoremap <silent> _" <Esc>`>a  <Esc>:s/\%V /", "/g<CR>`<i"<Esc>`>/  <CR>2s"
+" 'a', 'kind', 'of', 'quoted', 'list', 'case'
+vnoremap <silent> _' <Esc>`>a  <Esc>:s/\%V /', '/g<CR>`<i'<Esc>`>/  <CR>2s'
