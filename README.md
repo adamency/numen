@@ -40,11 +40,9 @@ after saying "scribe".  You can terminate it by pressing Ctrl+c or saying
 If nothing happened, you might need to specify the right microphone with the
 `--mic` option.  See `numen --list-mics` for what's available.
 
-The default phrases are in the `/etc/numen/phrases/` directory, and you can
-copy them to `~/.config/numen/phrases/` where you can edit them.  The most
-important files are `character.phrases` with the alphabet and symbols, and
-`control.phrases` with the modifiers, backspace and friends.  Have a go in
-your text editor.
+The default phrases are in the `/etc/numen/phrases/` and I'd start by looking
+at `character.phrases` with the alphabet and symbols, and `control.phrases`
+with the modifiers, backspace and friends.  Have a go in your text editor.
 
 ## Going Further
 
