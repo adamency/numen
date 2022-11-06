@@ -2,12 +2,6 @@
 
 # NUMENUSER=john
 # NUMENGROUP="$NUMENUSER"
-# DATA_HOME="/home/$NUMENUSER/.local/share"
-# export XAUTHORITY="/run/user/$(id -u $NUMENUSER)/Xauthority"
-# OPTS=$(
-# 	if [ -d "/home/$NUMENUSER/.config/numen/phrases" ]; then
-# 		printf %s\\n "/home/$NUMENUSER/.config/numen/phrases/"*.phrases
-# 	else
-# 		printf %s\\n /etc/numen/phrases/*.phrases
-# 	fi
-# )
+# NUMENHOME="/home/$NUMENUSER"
+# export HOME="$NUMENHOME"
+# export XAUTHORITY="/run/user/$(id -u "$NUMENUSER")/Xauthority"
