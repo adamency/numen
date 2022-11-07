@@ -8,4 +8,4 @@ if [ "$1" ]; then
 elif arecord -L | grep -qx sysdefault:CARD=Microphone; then
 	mic=sysdefault:CARD=Microphone
 fi
-arecord -D "$mic" --nonblock --quiet -f S16_LE -c 1 -r 16000
+exec arecord -D "$mic" --nonblock --quiet -f S16_LE -c 1 -r 16000
