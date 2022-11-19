@@ -61,3 +61,9 @@ You can ask for help or send patches by composing an email to
 [~geb/public-inbox@lists.sr.ht](https://lists.sr.ht/~geb/public-inbox).
 You're also welcome to join our Matrix chat at
 [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
+
+## License
+
+GPLv3 only, see [LICENSE](./LICENSE).
+
+Copyright (c) 2022 John Gebbie
