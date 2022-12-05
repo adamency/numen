@@ -40,6 +40,9 @@ environment or virtual console.
 *--mic=*_NAME_
 	Select the audio device.
 
+*--version*
+	Print the version and exit.
+
 *--x11*
 	Perform the actions for an X11 graphical environment.  This is more
 	limited than *--kernel* but requires less permissions.

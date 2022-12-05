@@ -4,6 +4,7 @@
 # If the environment variable PACKAGING is set, compiling speech.go is left
 # to you to do beforehand. It is meant for build systems packaging numen.
 # Example: PACKAGING=true ./install-numen.sh "$DESTDIR" /usr/bin
+version="$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.3)"
 
 if ! [ "$PACKAGING" ]; then
 	ok=1
@@ -31,7 +32,8 @@ cp -r handlers "$libexec" || exit
 # Install commands
 bin="$1/${2:-/usr/local/bin}"
 mkdir -p "$bin" || exit
-cp wrapper "$bin/numen" || exit
+sed "1 a \
+export NUMEN_VERSION=$version" wrapper > "$bin/numen" && chmod +x "$bin/numen" || exit
 # Install commands used in the default phrases
 cp displaying "$bin" || exit
 
