@@ -3,6 +3,16 @@
 Notable changes to Numen will be documented in this file.
 See ./phrases/CHANGELOG.md for changes to the default phrases.
 
+## [0.4](https://git.sr.ht/~geb/numen/refs/0.4)
+
+### Added
+
+- A --version flag.
+
+### Changed
+
+- Now exits less confusingly if no model is installed.
+
 ## [0.3](https://git.sr.ht/~geb/numen/refs/0.3)
 
 ### Added
