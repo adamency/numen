@@ -20,7 +20,7 @@ if ! [ "$PACKAGING" ]; then
 	go build speech.go || exit
 
 	# not necessary but lets you run ./numen in this directory
-	ln -sf /usr/share/vosk-models/small-en-us model
+	ln -sf "$1/usr/share/vosk-models/small-en-us" model
 fi
 
 # Install executables for internal use
@@ -38,8 +38,8 @@ export NUMEN_VERSION=$version" wrapper > "$bin/numen" && chmod +x "$bin/numen" |
 cp displaying "$bin" || exit
 
 # Install the default phrases
-mkdir -p /etc/numen && rm -rf /etc/numen/phrases && cp -r phrases /etc/numen || exit
+mkdir -p "$1/etc/numen" && rm -rf "$1/etc/numen/phrases" && cp -r phrases "$1/etc/numen" || exit
 # Install the manpage
-scdoc < doc/numen.1.scd > /usr/share/man/man1/numen.1 || exit
+mkdir -p "$1/usr/share/man/man1" && scdoc < doc/numen.1.scd > "$1/usr/share/man/man1/numen.1" || exit
 
 echo 'Installed successfully.'
