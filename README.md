@@ -62,6 +62,10 @@ You can ask for help or send patches by composing an email to
 You're also welcome to join our Matrix chat at
 [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
 
+## Support Me
+
+[Thank you!](https://liberapay.com/geb)
+
 ## License
 
 GPLv3 only, see [LICENSE](./LICENSE).
