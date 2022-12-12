@@ -6,29 +6,16 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"git.sr.ht/~geb/vox"
+	"github.com/go-audio/wav"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/m7shapan/njson"
-	"github.com/go-audio/wav"
-	vosk "github.com/alphacep/vosk-api/go"
 )
 
-// Cut slices s around the first instance of sep,
-// returning the text before and after sep.
-// The found result reports whether sep appears in s.
-// If sep does not appear in s, cut returns s, "", false.
-func strings_Cut(s, sep string) (before, after string, found bool) {
-	if i := strings.Index(s, sep); i >= 0 {
-		return s[:i], s[i+len(sep):], true
-	}
-	return s, "", false
-}
-
-func fatal(v ...interface{}) {
+func fatal(a ...any) {
 	fmt.Fprint(os.Stderr, "numen: ")
-	fmt.Fprintln(os.Stderr, v...)
+	fmt.Fprintln(os.Stderr, a...)
 	os.Exit(1)
 }
 
@@ -60,7 +47,7 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			if s := strings.TrimSpace(sc.Text()); len(s) == 0 || []rune(s)[0] == '#' {
 				continue
 			}
-			phrase, action, found := strings_Cut(sc.Text(), ":")
+			phrase, action, found := strings.Cut(sc.Text(), ":")
 			if len(action) > 0 {
 				for []rune(action)[len([]rune(action))-1] == '\\' {
 					if !sc.Scan() {
@@ -70,7 +57,7 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 				}
 			}
 			if !found {
-				phrase, _, _ = strings_Cut(phrase, "#")
+				phrase, _, _ = strings.Cut(phrase, "#")
 			}
 			fields := strings.Fields(phrase)
 			if len(fields) == 0 {
@@ -110,32 +97,6 @@ func checkAudio(r io.ReadSeeker) uint32 {
 	return d.SampleRate
 }
 
-func getPhrases(json string) []string {
-	var s struct {
-		Words []string `njson:"result.#.word"`
-		Partial string `njson:"partial"`
-	}
-	err := njson.Unmarshal([]byte(json), &s)
-	if err != nil {
-		panic(err)
-	}
-	if len(s.Partial) > 0 {
-		return strings.Fields(s.Partial)
-	}
-	return s.Words
-}
-
-func getTranscripts(json string) []string {
-	var s struct {
-		Alternatives []string `njson:"alternatives.#.text"`
-	}
-	err := njson.Unmarshal([]byte(json), &s)
-	if err != nil {
-		panic(err)
-	}
-	return s.Alternatives
-}
-
 type EventType int
 const (
 	ResetEvent EventType = iota
@@ -145,7 +106,7 @@ const (
 )
 type Event struct {
 	Type EventType
-	Content interface{}
+	Content any
 }
 
 func handleFinalized(cmds []Command, phrases []string) []Event {
@@ -199,16 +160,8 @@ func handleUnfinalized(cmds []Command, phrases []string, rapid bool) []Event {
 	return nil
 }
 
-func reset(r *vosk.VoskRecognizer) {
-	silence := make([]byte, 4096)
-	r.AcceptWaveform(silence)
-	r.Reset()
-	r.AcceptWaveform(silence)
-}
-
 func main() {
-	vosk.SetLogLevel(-1)
-	model, err := vosk.NewModel(os.Args[1])
+	model, err := vox.NewModel(os.Args[1])
 	if err != nil {
 		fatal(err)
 	}
@@ -239,23 +192,20 @@ func main() {
 		commands = append(commands, Command{"huh", nil, ""})
 	}
 
-	var cmdRec, transRec *vosk.VoskRecognizer
+	var cmdRec, transRec *vox.Recognizer
 	{
 		sampleRate := float64(checkAudio(os.Stdin))
-
-		var phrases strings.Builder
-		phrases.WriteString("[")
-		for _, c := range commands[:len(commands)-1] {
-			phrases.WriteString(`"` + c.Phrase + `", `)
+		phrases := make([]string, len(commands))
+		for i := range commands {
+			phrases[i] = commands[i].Phrase
 		}
-		phrases.WriteString(`"` + commands[len(commands)-1].Phrase + `"]`)
-		cmdRec, err = vosk.NewRecognizerGrm(model, sampleRate, phrases.String())
+		cmdRec, err = vox.NewRecognizer(model, sampleRate, phrases)
 		if err != nil {
 			fatal(err)
 		}
-		cmdRec.SetWords(1)
+		cmdRec.SetWords(true)
 
-		transRec, err = vosk.NewRecognizer(model, sampleRate)
+		transRec, err = vox.NewRecognizer(model, sampleRate, nil)
 		if err != nil {
 			fatal(err)
 		}
@@ -274,28 +224,38 @@ func main() {
 			if err == io.EOF || err == io.ErrUnexpectedEOF {
 				break
 			}
-			fatal(err)
+			panic(err.Error())
 		}
 
 		if commanding {
 			var events []Event
-			if cmdRec.AcceptWaveform(buf) == 0 {
-				events = handleUnfinalized(commands, getPhrases(cmdRec.PartialResult()), rapid)
+			finalized, err := cmdRec.Accept(buf)
+			if err != nil {
+				panic(err.Error())
+			}
+			if finalized {
+				result := cmdRec.Results()[0]
+				phrases := strings.Fields(result.Text)
+				events = handleFinalized(commands, phrases)
 			} else {
-				events = handleFinalized(commands, getPhrases(cmdRec.FinalResult()))
-				reset(cmdRec)
+				result := cmdRec.Results()[0]
+				phrases := strings.Fields(result.Text)
+				events = handleUnfinalized(commands, phrases, rapid)
 			}
 
 			for _, e := range events {
 				switch e.Type {
 				case ResetEvent:
-					reset(cmdRec)
+					cmdRec.Purge()
 				case TranscribeEvent:
 					commanding = false
 					transcriptAction = e.Content.(string)
 					// Seems partials are output the audio chunk after they end,
 					// so we should feed it to the other recognizer.
-					transRec.AcceptWaveform(buf)
+					_, err := transRec.Accept(buf)
+					if err != nil {
+						panic(err.Error())
+					}
 				case RapidOnEvent:
 					rapid = true
 				case RapidOffEvent:
@@ -303,16 +263,20 @@ func main() {
 				}
 			}
 		} else {
-			if transRec.AcceptWaveform(buf) != 0 {
-				for i, t := range getTranscripts(transRec.Result()) {
-					fmt.Printf("transcript%d:%s\n", i+1, t)
+			finalized, err := transRec.Accept(buf)
+			if err != nil {
+				panic(err.Error())
+			}
+			if finalized {
+				for i, result := range transRec.Results() {
+					fmt.Printf("transcript%d:%s\n", i+1, result.Text)
 				}
 				fmt.Println(transcriptAction)
-				reset(cmdRec)
+				cmdRec.Purge()
 				commanding = true
 			}
 		}
 	}
 
-	fmt.Println(string(cmdRec.FinalResult()))
+	// We don't handle any final bit of audio.
 }

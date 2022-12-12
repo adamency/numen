@@ -1,3 +1,5 @@
+git.sr.ht/~geb/vox v0.0.0-20221217113526-fd60e3a2bae7 h1:vs2yYgXsdpv45aKrAbObCZjTTO2YJYvcLDXAyem1EfQ=
+git.sr.ht/~geb/vox v0.0.0-20221217113526-fd60e3a2bae7/go.mod h1:GACMnE06H9nkXCew3iedZJSAbs2Lol1EJqK+tvo0UBg=
 github.com/alphacep/vosk-api/go v0.3.43 h1:VITYOR7c9ANGweLJmNrnNt24QW3GwtdqqD9LUJ52IbI=
 github.com/alphacep/vosk-api/go v0.3.43/go.mod h1:9X8IJsHnFk/b1xyvjlZifo+ZL5VTAx3LW+JQce/eRcA=
 github.com/go-audio/audio v1.0.0 h1:zS9vebldgbQqktK4H0lUqWrG8P0NxCJVqcj7ZpNnwd4=
@@ -16,5 +18,4 @@ github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
 github.com/tidwall/match v1.1.1/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
 github.com/tidwall/pretty v1.2.0 h1:RWIZEg2iJ8/g6fDDYzMpobmaoGh5OLl4AXtGUGPcqCs=
 github.com/tidwall/pretty v1.2.0/go.mod h1:ITEVvHYasfjBbM0u2Pg8T2nJnzm8xPwvNhhsoaGGjNU=
-golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
