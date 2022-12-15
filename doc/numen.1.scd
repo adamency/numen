@@ -125,25 +125,20 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 Tags have phrases act specially.  Unsupported tags are silently ignored.
 The supported tags are:
 
-*@instant*
-	If the phrase seems to have been said, instead of waiting till the
-	sentence is finished and finalized, perform the sentence so far.
-
 *@cancel*
-	Cancel the sentence.  Note without *@instant* preceding words are still
-	performed, but with *@instant* proceeding words are still performed.
+	Cancel the preceding phrases.
 
 *@transcribe*
-	Instead of performing phrases, listen till the end of the sentence,
-	then set the environment variable *NUMEN_TRANSCRIPT* to the speech
-	recognition result and perform the action.  An example that would
-	transcribe the rest of the sentence uppercase:++
-*@instant @transcribe scream:pen echo $NUMEN_TRANSCRIPT | tr '[:lower:]' '[:upper:]'*
+	Instead of performing phrases, listen till the next pause, then
+	set the environment variable *NUMEN_TRANSCRIPT* to the speech
+	recognition result and perform the action.  This example would
+	transcribe what you say in UPPERCASE:++
+*@transcribe scream:pen echo $NUMEN_TRANSCRIPT | tr '[:lower:]' '[:upper:]'*
 
-*@rapidon*
-	Act as if all phrases are tagged with *@instant* until a phrase
-	tagged *@rapidoff*.  Useful to shorten the response time in *sticky*
-	mode, but reduces recognition accuracy.
+*@rapidon* and *@rapidoff*
+	*@rapidon* has phrases performed early instead at the next pause,
+	until a phrase tagged *@rapidoff*.  This is useful to shorten the
+	response time in *sticky* mode but reduces recognition accuracy.
 
 *@kernel* *@x11*
 	Only listen for the phrase if performing the actions using one of

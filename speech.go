@@ -1,8 +1,6 @@
 // speech MODEL_DIR PHRASE_FILE [PHRASE_FILE...]
 package main
 
-// TODO Confidence threshold for @instant words.
-
 import (
 	"bufio"
 	"fmt"
@@ -88,76 +86,77 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 	return commands
 }
 
-func checkAudio(r io.ReadSeeker) uint32 {
+func inspectAudio(r io.ReadSeeker) (int, int) {
 	d := wav.NewDecoder(r)
 	d.ReadInfo()
 	if d.NumChans != 1 || d.WavAudioFormat != 1 {
 		panic("audio must be the WAV format and mono")
 	}
-	return d.SampleRate
+	return int(d.SampleRate), int(d.SampleBitDepth())
 }
 
 type EventType int
 const (
-	ResetEvent EventType = iota
-	TranscribeEvent
+	RapidOffEvent EventType = iota
 	RapidOnEvent
-	RapidOffEvent
+	TranscribeEvent
 )
 type Event struct {
 	Type EventType
 	Content any
 }
 
-func handleFinalized(cmds []Command, phrases []string) []Event {
-	var events []Event
-	for _, p := range phrases {
-		c, _ := get(cmds, p)
-		action := c.Action
-		var e []Event
-		for _, t := range c.Tags {
-			switch t {
-			case "cancel":
-				fmt.Println(action)
-				return e
-			case "transcribe":
-				 e = append(e, Event{TranscribeEvent, action})
-				 action = ""
-			case "rapidon":
-				e = append(e, Event{RapidOnEvent, nil})
-			case "rapidoff":
-				e = append(e, Event{RapidOffEvent, nil})
-			}
-		}
-		events = append(events, e...)
-		fmt.Println(action)
+func printTranscripts(transRec *vox.Recognizer, action string) {
+	for i, result := range transRec.FinalResults() {
+		fmt.Printf("transcript%d:%s\n", i+1, result.Text)
 	}
-	return events
+	fmt.Println(action)
 }
 
-func handleUnfinalized(cmds []Command, phrases []string, rapid bool) []Event {
-	if len(phrases) == 0 {
-		return nil
-	}
-	c, _ := get(cmds, phrases[len(phrases)-1])
-	instant := false
-	cancel := false
-	for _, t := range c.Tags {
-		if t == "instant" {
-			instant = true
-		} else if t == "cancel" {
-			cancel = true
+func handle(cmds []Command, phrases []vox.PhraseResult, transRec *vox.Recognizer, audio []byte) []Event {
+	cancel := 0
+	CANCEL:
+	for i := range phrases {
+		c, _ := get(cmds, phrases[i].Text)
+		for _, t := range c.Tags {
+			if t == "transcribe" {
+				break CANCEL
+			}
+			if t == "cancel" {
+				cancel = i
+			}
 		}
 	}
-	if instant || rapid {
-		if cancel {
-			handleFinalized(cmds, []string{phrases[len(phrases)-1]})
-			return []Event{Event{ResetEvent, nil}}
+	phrases = phrases[cancel:]
+	var events []Event
+	for p := range phrases {
+		c, _ := get(cmds, phrases[p].Text)
+		transcribe := false
+		for _, t := range c.Tags {
+			switch t {
+			case "transcribe":
+				 transcribe = true
+			case "rapidoff":
+				events = append(events, Event{RapidOffEvent, nil})
+			case "rapidon":
+				events = append(events, Event{RapidOnEvent, nil})
+			}
 		}
-		events := handleFinalized(cmds, phrases)
-		return append(events, Event{ResetEvent, nil})
+		if transcribe {
+			_, err := transRec.Accept(audio[phrases[p].End:])
+			if err != nil {
+				panic(err.Error())
+			}
+			if p == len(phrases)-1 {
+				events = append(events, Event{TranscribeEvent, c})
+			} else {
+				printTranscripts(transRec, c.Action)
+			}
+			break
+		}
+		fmt.Println(c.Action)
 	}
-	return nil
+	return events
 }
 
 func main() {
@@ -194,18 +193,18 @@ func main() {
 
 	var cmdRec, transRec *vox.Recognizer
 	{
-		sampleRate := float64(checkAudio(os.Stdin))
+		sampleRate, bitDepth := inspectAudio(os.Stdin)
 		phrases := make([]string, len(commands))
 		for i := range commands {
 			phrases[i] = commands[i].Phrase
 		}
-		cmdRec, err = vox.NewRecognizer(model, sampleRate, phrases)
+		cmdRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, phrases)
 		if err != nil {
 			fatal(err)
 		}
 		cmdRec.SetWords(true)
 
-		transRec, err = vox.NewRecognizer(model, sampleRate, nil)
+		transRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, nil)
 		if err != nil {
 			fatal(err)
 		}
@@ -215,9 +214,8 @@ func main() {
 	r := bufio.NewReader(os.Stdin)
 	buf := make([]byte, 4096)
 
-	commanding := true
+	var transcribing *Command
 	rapid := false
-	var transcriptAction string
 	for {
 		_, err :=  io.ReadFull(r, buf)
 		if err != nil {
@@ -227,39 +225,24 @@ func main() {
 			panic(err.Error())
 		}
 
-		if commanding {
-			var events []Event
+		if transcribing == nil {
 			finalized, err := cmdRec.Accept(buf)
 			if err != nil {
 				panic(err.Error())
 			}
-			if finalized {
-				result := cmdRec.Results()[0]
-				phrases := strings.Fields(result.Text)
-				events = handleFinalized(commands, phrases)
-			} else {
-				result := cmdRec.Results()[0]
-				phrases := strings.Fields(result.Text)
-				events = handleUnfinalized(commands, phrases, rapid)
-			}
+			if finalized || rapid {
+				phrases := cmdRec.FinalResults()[0].Phrases
+				events := handle(commands, phrases, transRec, cmdRec.Audio)
 
-			for _, e := range events {
-				switch e.Type {
-				case ResetEvent:
-					cmdRec.Purge()
-				case TranscribeEvent:
-					commanding = false
-					transcriptAction = e.Content.(string)
-					// Seems partials are output the audio chunk after they end,
-					// so we should feed it to the other recognizer.
-					_, err := transRec.Accept(buf)
-					if err != nil {
-						panic(err.Error())
+				for _, e := range events {
+					switch e.Type {
+					case RapidOffEvent:
+						rapid = false
+					case RapidOnEvent:
+						rapid = true
+					case TranscribeEvent:
+						transcribing = e.Content.(*Command)
 					}
-				case RapidOnEvent:
-					rapid = true
-				case RapidOffEvent:
-					rapid = false
 				}
 			}
 		} else {
@@ -268,12 +251,8 @@ func main() {
 				panic(err.Error())
 			}
 			if finalized {
-				for i, result := range transRec.Results() {
-					fmt.Printf("transcript%d:%s\n", i+1, result.Text)
-				}
-				fmt.Println(transcriptAction)
-				cmdRec.Purge()
-				commanding = true
+				printTranscripts(transRec, transcribing.Action)
+				transcribing = nil
 			}
 		}
 	}

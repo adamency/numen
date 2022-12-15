@@ -1,12 +1,12 @@
 # Cancel sentence
 # For example, "four down no five down" would just do "five down".
-@instant @cancel no
+@cancel no
 
 # Transcribe a sentence
 # For example, "scribe please type this".
-@instant @transcribe scribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g"
+@transcribe scribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g"
 # Transcribe a sentence with the first letter uppercase
-@instant @transcribe transcribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g" | awk '{print toupper(substr($0,1,1))substr($0,2)}'
+@transcribe transcribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g" | awk '{print toupper(substr($0,1,1))substr($0,2)}'
 
 # Erase the transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
