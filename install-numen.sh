@@ -18,9 +18,6 @@ if ! [ "$PACKAGING" ]; then
 	[ "$ok" ] || exit
 
 	go build speech.go || exit
-
-	# not necessary but lets you run ./numen in this directory
-	ln -sf "$1/usr/share/vosk-models/small-en-us" model
 fi
 
 # Install executables for internal use
