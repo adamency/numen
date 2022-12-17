@@ -80,7 +80,7 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			}
 		}
 		if sc.Err() != nil {
-			fatal(sc.Err())
+			panic(sc.Err())
 		}
 	}
 	return commands
@@ -200,13 +200,13 @@ func main() {
 		}
 		cmdRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, phrases)
 		if err != nil {
-			fatal(err)
+			panic(err.Error())
 		}
 		cmdRec.SetWords(true)
 
 		transRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, nil)
 		if err != nil {
-			fatal(err)
+			panic(err.Error())
 		}
 		transRec.SetMaxAlternatives(10)
 	}
