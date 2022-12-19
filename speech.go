@@ -230,7 +230,7 @@ func main() {
 			if err != nil {
 				panic(err.Error())
 			}
-			if finalized || rapid {
+			if finalized || (rapid && cmdRec.Results()[0].Text != "") {
 				phrases := cmdRec.FinalResults()[0].Phrases
 				events := handle(commands, phrases, transRec, cmdRec.Audio)
 
