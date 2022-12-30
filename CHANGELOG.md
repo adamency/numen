@@ -3,6 +3,25 @@
 Notable changes to Numen will be documented in this file.
 See ./phrases/CHANGELOG.md for changes to the default phrases.
 
+## [0.5](https://git.sr.ht/~geb/numen/refs/0.5)
+
+### Changed
+
+- Reimplemented @transcribe and @cancel to slice the audio once the
+results have been finalized, rather than hotplugging the audio between
+commanding/transcribing and relying on unfinalized results.
+- Now doesn't exit if the microphone is unplugged and continues when it is
+plugged back in.
+
+### Fixed
+
+- Fixed paths in ./install-numen.sh that ignored the DESTDIR argument.
+
+### Removed
+
+- Removed the @instant tag now it's no longer needed with @transcribe and
+@cancel.
+
 ## [0.4](https://git.sr.ht/~geb/numen/refs/0.4)
 
 ### Added

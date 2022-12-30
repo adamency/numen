@@ -4,7 +4,7 @@
 # If the environment variable PACKAGING is set, compiling speech.go is left
 # to you to do beforehand. It is meant for build systems packaging numen.
 # Example: PACKAGING=true ./install-numen.sh "$DESTDIR" /usr/bin
-version="$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.4)"
+version="$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.5)"
 
 if ! [ "$PACKAGING" ]; then
 	ok=1
