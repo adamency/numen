@@ -11,5 +11,5 @@ implicate:scrolldown
 
 # Center the cursor in the active window
 # (Requires the xdotool command and is X11 specific)
-center:set DISPLAY displaying\
+center:set DISPLAY /usr/libexec/numen/phrases/displaying\
 eval xdotool mousemove $(xdotool getactivewindow getwindowgeometry | awk '{sub(/[,x]/, " ")}; NR==2 {x=$2;y=$3}; NR==3 {print x+($2)/2, y+($3)/2}')

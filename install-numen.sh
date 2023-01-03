@@ -26,13 +26,14 @@ rm -rf "$libexec" && mkdir -p "$libexec" || exit
 cp awk instructor numen record scribe speech "$libexec" || exit
 cp -r handlers "$libexec" || exit
 
-# Install commands
+# Install the numen command
 bin="$1/${2:-/usr/local/bin}"
 mkdir -p "$bin" || exit
 sed "1 a \
 export NUMEN_VERSION=$version" wrapper > "$bin/numen" && chmod +x "$bin/numen" || exit
-# Install commands used in the default phrases
-cp displaying "$bin" || exit
+
+# Install scripts used in the default phrases
+mkdir -p "$libexec/phrases" && cp phrasescripts/* "$libexec/phrases" || exit
 
 # Install the default phrases
 mkdir -p "$1/etc/numen" && rm -rf "$1/etc/numen/phrases" && cp -r phrases "$1/etc/numen" || exit

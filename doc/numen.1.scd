@@ -57,8 +57,8 @@ That is, there can be zero or more "tags" each starting with *@*, then the
 phrase, then a *:* and the actions.  Empty lines and lines starting with *#*
 are ignored.  The *:* can be omitted if there are no actions.
 
-Currently, the phrase must be a single word.  The phrase must be known by
-the speech recognition or you'll be informed by an error.
+The words of the phrases must be known to the language model or you'll be
+informed by an error.
 
 Actions can come directly after other actions that don't use the rest of
 the line.  Multiple actions can be spread over multiple lines by ending each
@@ -181,6 +181,12 @@ Run *numen* using the default phrases in */etc/numen/phrases/*:
 
 You can try saying "hoof eve yank" and "scribe so this is a sentence" into
 your microphone, and terminate it by pressing *Ctrl*+*c* or saying "troll cap".
+
+# BUGS
+
+The implementation of phrases with multiple words is a kludge as internally
+the speech recognition can only be constrained to words not phrases, and
+*numen* can only abort if the result contains broken up phrases.
 
 # AUTHOR
 

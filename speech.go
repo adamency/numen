@@ -45,7 +45,7 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 			if s := strings.TrimSpace(sc.Text()); len(s) == 0 || []rune(s)[0] == '#' {
 				continue
 			}
-			phrase, action, found := strings.Cut(sc.Text(), ":")
+			speech, action, found := strings.Cut(sc.Text(), ":")
 			if len(action) > 0 {
 				for []rune(action)[len([]rune(action))-1] == '\\' {
 					if !sc.Scan() {
@@ -55,22 +55,25 @@ func parse(paths []string, known func(string) bool, skip func([]string) bool) []
 				}
 			}
 			if !found {
-				phrase, _, _ = strings.Cut(phrase, "#")
+				speech, _, _ = strings.Cut(speech, "#")
 			}
-			fields := strings.Fields(phrase)
-			if len(fields) == 0 {
-				fatal(f.Name() + ": line missing phrase: " + sc.Text())
-			}
-			phrase = fields[len(fields)-1]
-			tags := fields[:len(fields)-1]
-			for i := range tags {
-				if tags[i][0] != '@' {
-					fatal(f.Name() + ": currently only one-word phrases are supported: " + sc.Text())
+			var tags []string
+			var phrase string
+			for _, field := range strings.Fields(speech) {
+				if field[0] == '@' {
+					if phrase != "" {
+						fatal(f.Name() + ": all tags should be before the phrase: " + sc.Text())
+					}
+					tags = append(tags, field[1:])
+				} else {
+					if !known(field) {
+						fatal(f.Name() + ": unknown word: " + field)
+					}
+					if phrase != "" {
+						phrase += " "
+					}
+					phrase += field
 				}
-				tags[i] = tags[i][1:]
-			}
-			if !known(phrase) {
-				fatal(f.Name() + ": phrase not in the vocabulary: " + phrase)
 			}
 			if !skip(tags) {
 				if _, found := get(commands, phrase); found {
@@ -203,6 +206,8 @@ func main() {
 			panic(err.Error())
 		}
 		cmdRec.SetWords(true)
+		cmdRec.SetKeyphrases(true)
+		cmdRec.SetMaxAlternatives(3)
 
 		transRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, nil)
 		if err != nil {
@@ -231,17 +236,33 @@ func main() {
 				panic(err.Error())
 			}
 			if finalized || (rapid && cmdRec.Results()[0].Text != "") {
-				phrases := cmdRec.FinalResults()[0].Phrases
-				events := handle(commands, phrases, transRec, cmdRec.Audio)
-
-				for _, e := range events {
-					switch e.Type {
-					case RapidOffEvent:
-						rapid = false
-					case RapidOnEvent:
-						rapid = true
-					case TranscribeEvent:
-						transcribing = e.Content.(*Command)
+				for _, result := range cmdRec.FinalResults() {
+					phrases := result.Phrases
+					ok := result.Valid
+					if !ok {
+						for p := range phrases {
+							c, _ := get(commands, phrases[p].Text)
+							for _, t := range c.Tags {
+								if t == "transcribe" {
+									ok = true
+									break
+								}
+							}
+						}
+					}
+					if ok {
+						events := handle(commands, phrases, transRec, cmdRec.Audio)
+						for _, e := range events {
+							switch e.Type {
+							case RapidOffEvent:
+								rapid = false
+							case RapidOnEvent:
+								rapid = true
+							case TranscribeEvent:
+								transcribing = e.Content.(*Command)
+							}
+						}
+						break
 					}
 				}
 			}

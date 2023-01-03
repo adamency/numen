@@ -12,12 +12,11 @@ hype:mod alt
 # Clear modifiers
 @rapidoff forget:mod clear capsoff unstick
 
-# Turn on Caps Lock by saying "suck shout" (turn it off by saying "forget")
-shout:localeval [ "$NUMEN_SUPER" = 1 ] && echo capson\
-mod clear
+# Turn on Caps Lock (turn it off by saying "forget")
+suck shout:mod clear capson
 
 # Start holding down each pressed key (stop it by saying "forget")
-@rapidon sticky:stick
+@rapidon suck stick:stick
 
 hack:press BackSpace
 scrap:press BackSpace BackSpace
@@ -56,8 +55,15 @@ backward:press XF86Back
 forward:press XF86Forward
 refresh:press XF86Refresh
 
-# Menu of function keys and rare keys
-# (You can also input your own chord like ctrl+alt+F4)
-# (Requires the dmenu and xdotool commands)
-functions:set DISPLAY displaying\
-eval xdotool key -- "$(printf 'F1\nF2\nF3\nF4\nF5\nF6\nF7\nF8\nF9\nF10\nF11\nF12\nsterling £\nEuroSign €\nMenu\nInsert\nNum_Lock\nPrint\nScroll_Lock\nPause\n' | dmenu -i | sed 's/^ *//; s/ .*//')" &
+function one:press F1
+function two:press F2
+function three:press F3
+function four:press F4
+function five:press F5
+function six:press F6
+function seven:press F7
+function eight:press F8
+function nine:press F9
+function one zero:press F10
+function one one:press F11
+function one two:press F12

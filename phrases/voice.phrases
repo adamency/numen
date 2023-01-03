@@ -4,21 +4,50 @@
 
 # Transcribe a sentence
 # For example, "scribe please type this".
-@transcribe scribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g"
-# Transcribe a sentence with the first letter uppercase
-@transcribe transcribe:pen printf %s\\n "$NUMEN_TRANSCRIPT" | sed "s/^i /I /; s/ i / I /g; s/i'/I'/g" | awk '{print toupper(substr($0,1,1))substr($0,2)}'
+@transcribe scribe:set fmt echo normal\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# Transcribe a sentence formatted...
+# With the first letter uppercase
+@transcribe transcribe:set fmt echo sentence\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# With Each First Letter Uppercase
+@transcribe title scribe:set fmt echo title\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# UPPERCASE
+@transcribe shout scribe:set fmt echo upper\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# with_underscrores_inbetween
+@transcribe snake scribe:set fmt echo snake\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# UPPERCASE_WITH_UNDERSCRORES_INBETWEEN
+@transcribe trench scribe:set fmt echo uppersnake\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# with-dashes-inbetween
+@transcribe dash scribe:set fmt echo dash\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# with.dots.inbetween
+@transcribe dot scribe:set fmt echo dot\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# with/dots/inbetween
+@transcribe path scribe:set fmt echo path\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# allsmashedtogether
+@transcribe smash scribe:set fmt echo smash\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# camelCase
+@transcribe cam scribe:set fmt echo camel\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+# UpperCamelCase
+@transcribe cam transcribe:set fmt echo uppercamel\
+pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 
 # Erase the transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
-# Select the transcription like with a mouse (depending on the application)
-# (To use with Vim, see https://git.sr.ht/~geb/numen/tree/master/item/extras/select.vim)
-select:eval echo set NUMEN_KEY_DELAY echo 1; awk -v n=${#NUMEN_TEXT} 'BEGIN {printf "press"; for(;n--;) printf " shift+Left"; print ""}'; echo set NUMEN_KEY_DELAY echo $((NUMEN_KEY_DELAY))
 
 # Menu of transcription results
 # (Requires the dmenu command)
-transcripts:set DISPLAY displaying\
-eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; [ -s "$f" ] && printf 'type %s\n' "$(dmenu -i -l 10 < "$f")" || notify-send 'No transcripts' & } &
+transcripts:eval /usr/libexec/numen/phrases/transcripts "$fmt" &
 # Menu to change transcription result
 # (Requires the dmenu command)
-change:set DISPLAY displaying\
-eval { f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"; if [ "$(wc -l < "$f")" -gt 1 ]; then t="$(tail -n +2 "$f" | dmenu -i -l 10)" && awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}' && printf %s\\n "type $t"; else notify-send 'No alternative transcripts' & fi } &
+change:eval /usr/libexec/numen/phrases/transcripts "$fmt" change &

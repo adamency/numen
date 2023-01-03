@@ -1,0 +1,20 @@
+#!/bin/sh
+# transcripts FORMAT [CHANGE]
+
+export DISPLAY="$(/usr/libexec/numen/phrases/displaying)"
+
+f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"
+if [ "$2" ]; then
+	if [ "$(wc -l < "$f")" -gt 1 ]; then
+		if transcript="$(tail -n +2 "$f" | /usr/libexec/numen/phrases/fmt "$1" | dmenu -i -l 10)"; then
+			awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
+			printf 'type %s\n' "$transcript"
+		fi
+	else
+		notify-send 'No alternative transcripts' &
+	fi
+elif [ -s "$f" ]; then
+	printf 'type %s\n' "$(/usr/libexec/numen/phrases/fmt "$1" < "$f" | dmenu -i -l 10)"
+else
+	notify-send 'No transcripts' &
+fi
