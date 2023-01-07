@@ -1,5 +1,4 @@
 #!/bin/sh
-cd /usr/libexec/numen || exit
 if [ -z "$NUMEN_MODEL" ]; then
 	if [ -e /usr/local/share/vosk-models/small-en-us ]; then
 		export NUMEN_MODEL=/usr/local/share/vosk-models/small-en-us
@@ -10,4 +9,4 @@ if [ -z "$NUMEN_MODEL" ]; then
 		exit 1
 	fi
 fi
-exec ./numen "$@"
+exec /usr/libexec/numen/numen "$@"

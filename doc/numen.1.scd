@@ -24,6 +24,10 @@ environment or virtual console.
 
 # OPTIONS
 
+*--audio=*_FILE_
+	Specify an audio file to use instead of the microphone.  This isn't for
+	normal use, and the correct audio format depends on the language model.
+
 *-h*, *--help*
 	Print help and exit.
 

@@ -6,19 +6,22 @@ if ! command -v arecord > /dev/null; then
 fi
 
 mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
-handler=handlers/kernel
-mic=
 model="${NUMEN_MODEL:-model}"
-args="$(getopt -n numen -o h -l help,kernel,list-mics,mic:,version,x11 -- "$@")" || exit
+
+handler=handlers/kernel audio= mic=
+args="$(getopt -n numen -o h -l audio:,help,kernel,list-mics,mic:,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
+	--audio) audio="$PWD/$2"; shift 2;;
 	-h|--help) echo 'numen [PHRASE_FILE...]
---kernel       Use the kernel handler to perform the actions (the default).
---list-mics    List audio devices and exit.
---mic=NAME     Select the audio device.
---version      Print the version and exit.
---x11          Use the X11 handler to perform the actions.'; exit;;
+
+--audio=FILE Specify an audio file to use instead of the microphone.
+--kernel     Use the kernel handler to perform the actions (the default).
+--list-mics  List audio devices and exit.
+--mic=NAME   Select the audio device.
+--version    Print the version and exit.
+--x11        Use the X11 handler to perform the actions.'; exit;;
 	--kernel) handler=handlers/kernel; shift;;
 	--list-mics) arecord -L | sed -E '/^sysdefault:/ !d; s/.*=//; N'; exit;;
 	--mic) mic="$2"; shift 2;;
@@ -36,11 +39,20 @@ if [ $# = 0 ]; then
 	fi
 fi
 
+if [ "$0" != ./numen ]; then
+	cd /usr/libexec/numen || exit
+fi
+
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
 pipe="$tmpdir/pipe"
 mkfifo -m 600 "$pipe" || exit
-./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
+
+if [ "$audio" ]; then
+	./speech "$model" "$@" < "$audio" | ./scribe > "$pipe"
+else
+	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe"
+fi &
 
 export NUMEN_HANDLER="${handler#*/}"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
