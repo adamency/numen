@@ -36,17 +36,11 @@ if [ $# = 0 ]; then
 	fi
 fi
 
-unset tmpdir
+tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
-
-if [ "$NUMEN_PIPE" ]; then
-	pipe="$NUMEN_PIPE"
-else
-	tmpdir="$(mktemp -d)"
-	pipe="$tmpdir/pipe"
-	mkfifo -m 600 "$pipe" || exit
-	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
-fi
+pipe="$tmpdir/pipe"
+mkfifo -m 600 "$pipe" || exit
+./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
 
 export NUMEN_HANDLER="${handler#*/}"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
