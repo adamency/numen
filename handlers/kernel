@@ -22,7 +22,9 @@ iscapsoff() {
 	[ "$1" != 1 ]; return
 }
 
-alias dotool='{ print "keydelay 8" "typedelay 4"; cat; } | dotool'
+alias dotool='{
+	print "keydelay 2" "keyhold 8" "typedelay 2" "typehold 8"; cat
+} | dotool'
 
 caps=0
 while IFS= read -r line; do
