@@ -154,8 +154,12 @@ The supported tags are:
 by the *set* action:
 
 - *NUMEN_SHELL* sets the shell used for *pen* and *eval* actions.
-- *NUMEN_TYPE_DELAY* sets the keystroke delay of the *type* and *pen* actions.
-- *NUMEN_KEY_DELAY* sets the keystroke delay of the *press* action.
+- *NUMEN_KEY_DELAY* sets the delay between keys with the *press* action.
+- *NUMEN_KEY_HOLD* sets the time keys are held with the *press* action.
+- *NUMEN_TYPE_DELAY* sets the delay between keys with the *type* and *pen*
+  actions.
+- *NUMEN_TYPE_HOLD* sets the time keys are held with the *type* and *pen*
+  actions.
 
 When *numen* executes a shell command, it provides some environment variables
 exposing *numen*'s state:

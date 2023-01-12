@@ -22,9 +22,19 @@ iscapsoff() {
 	[ "$1" != 1 ]; return
 }
 
-alias dotool='{
-	print "keydelay 2" "keyhold 8" "typedelay 2" "typehold 8"; cat
-} | dotool'
+export NUMEN_KEY_DELAY="${NUMEN_KEY_DELAY:-2}"
+export NUMEN_KEY_HOLD="${NUMEN_KEY_HOLD:-8}"
+export NUMEN_TYPE_DELAY="${NUMEN_TYPE_DELAY:-2}"
+export NUMEN_TYPE_HOLD="${NUMEN_TYPE_HOLD:-8}"
+mydotool() {
+	{
+		print "keydelay $NUMEN_KEY_DELAY"
+		print "keyhold $NUMEN_KEY_HOLD"
+		print "typedelay $NUMEN_TYPE_DELAY"
+		print "typehold $NUMEN_TYPE_HOLD"
+		cat
+	} | dotool
+}
 
 caps=0
 while IFS= read -r line; do
@@ -52,8 +62,12 @@ while IFS= read -r line; do
 		value="$(shell -c "${line#* }")"
 		if [ "${line%% *}" = NUMEN_KEY_DELAY ]; then
 			print "keydelay $value"
+		elif [ "${line%% *}" = NUMEN_KEY_HOLD ]; then
+			print "keyhold $value"
 		elif [ "${line%% *}" = NUMEN_TYPE_DELAY ]; then
 			print "typedelay $value"
+		elif [ "${line%% *}" = NUMEN_TYPE_HOLD ]; then
+			print "typehold $value"
 		fi
 		export -- "${line%% *}=$value"
 	elif prefixed "$line" handler; then
@@ -61,8 +75,8 @@ while IFS= read -r line; do
 	else
 		print "$line"
 	fi
-done | if ! dotool; then
-	if ! : | dotool 2> /dev/null; then
+done | if ! mydotool; then
+	if ! : | mydotool 2> /dev/null; then
 		echo 'numen: Failed to create the input device, you might not have the permissions.
 Make sure you are in group input (see: id -Gn) and run: sudo udevadm trigger
 The command reloads the udev rule installed with numen, alternatively you can reboot.

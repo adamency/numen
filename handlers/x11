@@ -17,7 +17,15 @@ iscapsoff() {
 	xset q | awk '/Caps Lock/ {exit $4 != "off"}'
 }
 
-xdotoolstdin() {
+export NUMEN_KEY_DELAY="${NUMEN_KEY_DELAY:-10}"
+export NUMEN_TYPE_DELAY="${NUMEN_TYPE_DELAY:-10}"
+if [ "$NUMEN_KEY_HOLD" ]; then
+	echo 'numen: currently the X11 handler ignores $NUMEN_KEY_HOLD' >&2
+fi
+if [ "$NUMEN_TYPE_HOLD" ]; then
+	echo 'numen: currently the X11 handler ignores $NUMEN_TYPE_HOLD' >&2
+fi
+myxdotool() {
 	while IFS= read -r line; do
 		if prefixed "$line" type; then
 			# The '' stops xdotool complaining if there's nothing to type.
@@ -31,14 +39,14 @@ xdotoolstdin() {
 while IFS= read -r line; do
 	line="${line#local}"
 	if prefixed "$line" key; then
-		print "${line%% *} --delay ${NUMEN_KEY_DELAY:-4} -- ${line#* }"
+		print "${line%% *} --delay $NUMEN_KEY_DELAY -- ${line#* }"
 	elif prefixed "$line" type; then
 		export NUMEN_TEXT="${line#type }"
-		print "type --delay ${NUMEN_TYPE_DELAY:-4} -- $NUMEN_TEXT"
+		print "type --delay $((NUMEN_TYPE_DELAY*2)) -- $NUMEN_TEXT"
 	elif [ "$line" = capson ]; then
-		iscapsoff && print "key --delay ${NUMEN_KEY_DELAY:-4} Caps_Lock"
+		iscapsoff && print "key --delay $NUMEN_KEY_DELAY Caps_Lock"
 	elif [ "$line" = capsoff ]; then
-		iscapson && print "key --delay ${NUMEN_KEY_DELAY:-4} Caps_Lock"
+		iscapson && print "key --delay $NUMEN_KEY_DELAY Caps_Lock"
 	elif prefixed "$line" click; then
 		print "$line" | sed 's/left/1/; s/middle/2/; s/right/3/'
 	elif [ "$line" = scrollup ]; then
@@ -54,7 +62,7 @@ while IFS= read -r line; do
 		awk -v w="${size%x*}" -v h="${size#*x}" -v x="${coord% *}" -v y="${coord#* }" 'BEGIN {print "mousemove -- "w*x" "h*y}'
 	elif prefixed "$line" pen; then
 		export NUMEN_TEXT="$(shell -c "${line#pen }")"
-		print "$NUMEN_TEXT" | sed "s/^/type --delay ${NUMEN_TYPE_DELAY} -- /; 1 !s/^/key --delay ${NUMEN_TYPE_DELAY} -- Return\n/"
+		print "$NUMEN_TEXT" | sed "s/^/type --delay $((NUMEN_TYPE_DELAY*2)) -- /; 1 !s/^/key --delay $((NUMEN_TYPE_DELAY*2)) -- Return\n/"
 	elif prefixed "$line" eval; then
 		shell -c "${line#eval }" > "$1"
 	elif prefixed "$line" set; then
@@ -63,4 +71,4 @@ while IFS= read -r line; do
 	elif prefixed "$line" handler; then
 		exec "handlers/${line#handler }"
 	fi
-done | xdotoolstdin
+done | myxdotool

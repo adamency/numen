@@ -56,7 +56,5 @@ fi &
 
 export NUMEN_HANDLER="${handler#*/}"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
-export NUMEN_KEY_DELAY="${NUMEN_KEY_DELAY:-8}"
-export NUMEN_TYPE_DELAY="${NUMEN_TYPE_DELAY:-4}"
 ./instructor < "$pipe" | "$handler" "$pipe" &
 wait
