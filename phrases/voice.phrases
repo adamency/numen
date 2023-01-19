@@ -45,6 +45,9 @@ pen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 # Erase the transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
 
+# Go to the start of the transcription
+return:eval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
+
 # Menu of transcription results
 # (Requires the dmenu command)
 transcripts:eval /usr/libexec/numen/phrases/transcripts "$fmt" &
