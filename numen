@@ -49,10 +49,10 @@ pipe="$tmpdir/pipe"
 mkfifo -m 600 "$pipe" || exit
 
 if [ "$audio" ]; then
-	./speech "$model" "$@" < "$audio" | ./scribe > "$pipe"
+	./speech "$model" "$@" < "$audio" | ./scribe > "$pipe" &
 else
-	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe"
-fi &
+	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
+fi
 
 export NUMEN_HANDLER="${handler#*/}"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
