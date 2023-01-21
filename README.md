@@ -71,4 +71,4 @@ You're also welcome to join our Matrix chat at
 
 GPLv3 only, see [LICENSE](./LICENSE).
 
-Copyright (c) 2022 John Gebbie
+Copyright (c) 2022-2023 John Gebbie
