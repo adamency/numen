@@ -43,10 +43,14 @@ if [ "$0" != ./numen ]; then
 	cd /usr/libexec/numen || exit
 fi
 
-tmpdir="$(mktemp -d)"
-trap 'rm -rf "$tmpdir"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
-pipe="$tmpdir/pipe"
-mkfifo -m 600 "$pipe" || exit
+pipe="${NUMEN_PIPE:-/tmp/numen_pipe}"
+if [ -p "$pipe" ] && /bin/echo 1<>"$pipe" >"$pipe"; then
+	echo "numen: another instance is already reading the pipe: $pipe" >&2
+	exit 1
+fi
+rm -f -- "$pipe" || exit 1
+trap 'rm -f -- "$pipe"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
+mkfifo -m 600 "$pipe" || exit 1
 
 if [ "$audio" ]; then
 	./speech "$model" "$@" < "$audio" | ./scribe > "$pipe" &
@@ -55,6 +59,7 @@ else
 fi
 
 export NUMEN_HANDLER="${handler#*/}"
+export NUMEN_PIPE="$pipe"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
-./instructor < "$pipe" | "$handler" "$pipe" &
+./instructor < "$pipe" | "$handler" &
 wait

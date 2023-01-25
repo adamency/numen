@@ -1,5 +1,4 @@
 #!/bin/sh
-# ./handlers/x11 PIPE
 export NUMEN_HANDLER=x11
 
 alias print='printf %s\\n'
@@ -64,7 +63,7 @@ while IFS= read -r line; do
 		export NUMEN_TEXT="$(shell -c "${line#pen }")"
 		print "$NUMEN_TEXT" | sed "s/^/type --delay $((NUMEN_TYPE_DELAY*2)) -- /; 1 !s/^/key --delay $((NUMEN_TYPE_DELAY*2)) -- Return\n/"
 	elif prefixed "$line" eval; then
-		shell -c "${line#eval }" > "$1"
+		shell -c "${line#eval }" > "$NUMEN_PIPE"
 	elif prefixed "$line" set; then
 		line="${line#set }"
 		export -- "${line%% *}=$(shell -c "${line#* }")"

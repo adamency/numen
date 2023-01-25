@@ -33,11 +33,12 @@ rm -rf "$libexec" && mkdir -p "$libexec" || exit
 cp awk instructor numen record scribe speech "$libexec" || exit
 cp -r handlers "$libexec" || exit
 
-# Install the numen command
+# Install the numen and numenc command
 bin="$1/${2:-/usr/local/bin}"
 mkdir -p "$bin" || exit
 sed "1 a \
 export NUMEN_VERSION=$version" wrapper > "$bin/numen" && chmod +x "$bin/numen" || exit
+cp numenc "$bin" || exit
 
 # Install scripts used in the default phrases
 mkdir -p "$libexec/phrases" && cp phrasescripts/* "$libexec/phrases" || exit
