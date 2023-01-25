@@ -189,7 +189,7 @@ for (;;) {
 	}
 
 	if ($1 == "handler") {
-		if ($2 == "kernel" || $2 == "x11") {
+		if ($2 == "gadget" || $2 == "kernel" || $2 == "x11") {
 			for (m in Mods) setmod(m, 0)
 			print "handler " $2
 			fflush()

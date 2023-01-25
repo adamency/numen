@@ -177,7 +177,7 @@ func main() {
 		skip := func(tags []string) bool {
 			constrained := false
 			for _, t := range tags {
-				for _, h := range []string{"kernel", "x11"} {
+				for _, h := range []string{"gadget", "kernel", "x11"} {
 					if t == h && h == handler {
 						return false
 					}

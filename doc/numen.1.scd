@@ -6,7 +6,7 @@ numen(1)
 
 # SYNOPSIS
 
-*numen* [*--kernel*|*--x11*] [*--mic=*_NAME_] [_FILE_...]++
+*numen* [*--gadget*|*--kernel*|*--x11*] [*--mic=*_NAME_] [_FILE_...]++
 *numen* *--help*
 
 # DESCRIPTION
@@ -30,6 +30,12 @@ environment or virtual console.
 
 *-h*, *--help*
 	Print help and exit.
+
+*--gadget*
+	Perform the actions over USB. This requires the *gadget* command
+	(https://git.sr.ht/~geb/gadget). The *pen* and *eval* actions, that
+	usually run commands, instead send actions over the serial port,
+	but it seems too unreliable currently.
 
 *--kernel*
 	The default mode, perform the actions at a low enough level to work in
@@ -117,18 +123,27 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 	Execute the rest of the line in the shell and type any stdout.
 	An example that types the date: *pen date +%D*
 
+*localpen* _COMMAND_
+	The same as *pen* except in *--gadget* mode where this runs the command
+	on the gadget rather than sending the action to the receiving machine.
+
 *eval* _COMMAND_
 	Reinterpret the rest of the line as the stdout it produces when shell
 	evaluated.  An example that backspaces the previously typed text:++
 *eval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'*
+
+*localeval* _COMMAND_
+	The same as *eval* except in *--gadget* mode where this runs the
+	command on the gadget rather than sending the action to the receiving
+	machine.
 
 *set* _ENVIRONMENT_VARIABLE_ _COMMAND_
 	Set _ENVIRONMENT_VARIABLE_ to the stdout the rest of the line produces
 	when shell evaluated.  An example that tweaks *numen*:++
 *set NUMEN_TYPE_DELAY echo 20*
 
-*handler* *kernel*/*x11*
-	Change between the *--kernel* and *--x11* modes.
+*handler* *gadget*/*kernel*/*x11*
+	Change between the *--gadget*, *--kernel* and *--x11* modes.
 
 Tags have phrases act specially.  Unsupported tags are silently ignored.
 The supported tags are:
@@ -148,7 +163,7 @@ The supported tags are:
 	until a phrase tagged *@rapidoff*.  This is useful to shorten the
 	response time in *sticky* mode but reduces recognition accuracy.
 
-*@kernel* *@x11*
+*@gadget* *@kernel* *@x11*
 	Only listen for the phrase if performing the actions using one of
 	the tagged modes.
 
@@ -168,8 +183,7 @@ by the *set* action:
 When *numen* executes a shell command, it provides some environment variables
 exposing *numen*'s state:
 
-- *NUMEN_HANDLER* is *kernel* or *x11* depending on which mode the actions
-  are being performed.
+- *NUMEN_HANDLER* is *gadget*, *kernel* or *x11*.
 - *NUMEN_TEXT* is the last *type*/*pen* text.
 - *NUMEN_TRANSCRIPT* is the literal sentence from a *@transcribe* phrase.
 - *NUMEN_SUPER*, *NUMEN_CTRL*, *NUMEN_ALT* and *NUMEN_SHIFT* are either *0*

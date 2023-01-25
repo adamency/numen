@@ -6,7 +6,7 @@ if ! command -v arecord > /dev/null; then
 fi
 
 handler=kernel audio= mic=
-args="$(getopt -n numen -o h -l audio:,help,kernel,list-mics,mic:,speechless,version,x11 -- "$@")" || exit
+args="$(getopt -n numen -o h -l audio:,help,gadget,kernel,list-mics,mic:,speechless,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
@@ -14,6 +14,7 @@ while :; do
 	-h|--help) echo "numen [PHRASE_FILE...]
 
 --audio=FILE Specify an audio file to use instead of the microphone.
+--gadget     Use the gadget handler to perform the actions over USB.
 --kernel     Use the kernel handler to perform the actions (the default).
 --list-mics  List audio devices and exit.
 --mic=NAME   Select the audio device.
@@ -21,6 +22,7 @@ while :; do
 --version    Print the version and exit.
 --x11        Use the X11 handler to perform the actions."; exit;;
 	--kernel) handler=kernel; shift;;
+	--gadget) handler=gadget; shift;;
 	--list-mics) arecord -L | sed -E '/^sysdefault:/ !d; s/.*=//; N'; exit;;
 	--mic) mic="$2"; shift 2;;
 	--speechless) speechless="$2"; shift;;
