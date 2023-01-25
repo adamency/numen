@@ -70,7 +70,7 @@ while IFS= read -r line; do
 		fi
 		export -- "${line%% *}=$value"
 	elif prefixed "$line" handler; then
-		exec "handlers/${line#handler }"
+		exec "/usr/libexec/numen/handlers/${line#handler }"
 	else
 		print "$line"
 	fi

@@ -68,6 +68,6 @@ while IFS= read -r line; do
 		line="${line#set }"
 		export -- "${line%% *}=$(shell -c "${line#* }")"
 	elif prefixed "$line" handler; then
-		exec "handlers/${line#handler }"
+		exec "/usr/libexec/numen/handlers/${line#handler }"
 	fi
 done | myxdotool

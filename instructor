@@ -1,4 +1,4 @@
-#! ./awk -f
+#!/usr/libexec/numen/awk -f
 # Simplifies actions for the handlers.
 
 BEGIN {

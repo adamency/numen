@@ -1,4 +1,4 @@
-#! ./awk -f
+#!/usr/libexec/numen/awk -f
 # Filters the output of ./speech for ./instructor and continuously writes transcript results to a file.
 function erase(file) { system("> "file) }
 BEGIN {

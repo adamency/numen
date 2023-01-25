@@ -5,15 +5,12 @@ if ! command -v arecord > /dev/null; then
 	exit 1
 fi
 
-mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
-model="${NUMEN_MODEL:-model}"
-
-handler=handlers/kernel audio= mic=
+handler=kernel audio= mic=
 args="$(getopt -n numen -o h -l audio:,help,kernel,list-mics,mic:,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
-	--audio) audio="$PWD/$2"; shift 2;;
+	--audio) audio="$2"; shift 2;;
 	-h|--help) echo 'numen [PHRASE_FILE...]
 
 --audio=FILE Specify an audio file to use instead of the microphone.
@@ -22,11 +19,11 @@ while :; do
 --mic=NAME   Select the audio device.
 --version    Print the version and exit.
 --x11        Use the X11 handler to perform the actions.'; exit;;
-	--kernel) handler=handlers/kernel; shift;;
+	--kernel) handler=kernel; shift;;
 	--list-mics) arecord -L | sed -E '/^sysdefault:/ !d; s/.*=//; N'; exit;;
 	--mic) mic="$2"; shift 2;;
 	--version) printf %s\\n "$NUMEN_VERSION"; exit;;
-	--x11) handler=handlers/x11; shift;;
+	--x11) handler=x11; shift;;
 	--) shift; break;;
 	esac
 done
@@ -39,11 +36,10 @@ if [ $# = 0 ]; then
 	fi
 fi
 
-if [ "$0" != ./numen ]; then
-	cd /usr/libexec/numen || exit
-fi
-
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
 pipe="${NUMEN_PIPE:-/tmp/numen_pipe}"
+model="${NUMEN_MODEL:-model}"
+
 if [ -p "$pipe" ] && /bin/echo 1<>"$pipe" >"$pipe"; then
 	echo "numen: another instance is already reading the pipe: $pipe" >&2
 	exit 1
@@ -52,14 +48,15 @@ rm -f -- "$pipe" || exit 1
 trap 'rm -f -- "$pipe"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
 mkfifo -m 600 "$pipe" || exit 1
 
+libexec=/usr/libexec/numen
 if [ "$audio" ]; then
-	./speech "$model" "$@" < "$audio" | ./scribe > "$pipe" &
+	"$libexec/speech" "$model" "$@" < "$audio" | "$libexec/scribe" > "$pipe" &
 else
-	./record "$mic" | ./speech "$model" "$@" | ./scribe > "$pipe" &
+	"$libexec/record" "$mic" | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe" &
 fi
 
-export NUMEN_HANDLER="${handler#*/}"
+export NUMEN_HANDLER="$handler"
 export NUMEN_PIPE="$pipe"
 export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
-./instructor < "$pipe" | "$handler" &
+"$libexec/instructor" < "$pipe" | "$libexec/handlers/$handler" &
 wait
