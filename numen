@@ -52,6 +52,10 @@ rm -f -- "$pipe" || exit 1
 trap 'rm -f -- "$pipe"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
 mkfifo -m 600 "$pipe" || exit 1
 
+export NUMEN_HANDLER="$handler"
+export NUMEN_PIPE="$pipe"
+export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
+
 libexec=/usr/libexec/numen
 if ! [ "$speechless" ]; then
 	if [ "$audio" ]; then
@@ -61,8 +65,5 @@ if ! [ "$speechless" ]; then
 	fi
 fi
 
-export NUMEN_HANDLER="$handler"
-export NUMEN_PIPE="$pipe"
-export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
 "$libexec/instructor" < "$pipe" | "$libexec/handlers/$handler" &
 wait
