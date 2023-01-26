@@ -6,22 +6,24 @@ if ! command -v arecord > /dev/null; then
 fi
 
 handler=kernel audio= mic=
-args="$(getopt -n numen -o h -l audio:,help,kernel,list-mics,mic:,version,x11 -- "$@")" || exit
+args="$(getopt -n numen -o h -l audio:,help,kernel,list-mics,mic:,speechless,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
 	--audio) audio="$2"; shift 2;;
-	-h|--help) echo 'numen [PHRASE_FILE...]
+	-h|--help) echo "numen [PHRASE_FILE...]
 
 --audio=FILE Specify an audio file to use instead of the microphone.
 --kernel     Use the kernel handler to perform the actions (the default).
 --list-mics  List audio devices and exit.
 --mic=NAME   Select the audio device.
+--speechless Don't do speech recognition (to just send actions with numenc).
 --version    Print the version and exit.
---x11        Use the X11 handler to perform the actions.'; exit;;
+--x11        Use the X11 handler to perform the actions."; exit;;
 	--kernel) handler=kernel; shift;;
 	--list-mics) arecord -L | sed -E '/^sysdefault:/ !d; s/.*=//; N'; exit;;
 	--mic) mic="$2"; shift 2;;
+	--speechless) speechless="$2"; shift;;
 	--version) printf %s\\n "$NUMEN_VERSION"; exit;;
 	--x11) handler=x11; shift;;
 	--) shift; break;;
@@ -49,10 +51,12 @@ trap 'rm -f -- "$pipe"; pkill -P $$; trap - EXIT; exit' EXIT INT TERM HUP
 mkfifo -m 600 "$pipe" || exit 1
 
 libexec=/usr/libexec/numen
-if [ "$audio" ]; then
-	"$libexec/speech" "$model" "$@" < "$audio" | "$libexec/scribe" > "$pipe" &
-else
-	"$libexec/record" "$mic" | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe" &
+if ! [ "$speechless" ]; then
+	if [ "$audio" ]; then
+		"$libexec/speech" "$model" "$@" < "$audio" | "$libexec/scribe" > "$pipe" &
+	else
+		"$libexec/record" "$mic" | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe" &
+	fi
 fi
 
 export NUMEN_HANDLER="$handler"

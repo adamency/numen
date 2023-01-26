@@ -44,6 +44,10 @@ environment or virtual console.
 *--mic=*_NAME_
 	Select the audio device.
 
+*--speechless*
+	Don't do speech recognition. This this is useful with *numenc* to just
+	perform actions programmatically.
+
 *--version*
 	Print the version and exit.
 
