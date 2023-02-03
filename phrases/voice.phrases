@@ -29,7 +29,7 @@ localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt
 # with.dots.inbetween
 @transcribe dot scribe:set fmt echo dot\
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
-# with/dots/inbetween
+# with/slashes/inbetween
 @transcribe path scribe:set fmt echo path\
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 # allsmashedtogether
