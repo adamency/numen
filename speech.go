@@ -109,11 +109,19 @@ type Event struct {
 	Content any
 }
 
-func printTranscripts(transRec *vox.Recognizer, action string) {
+func printCommand(cmd *Command) {
+	fmt.Println(cmd.Action)
+	f := os.NewFile(3, "/dev/fd/3")
+	if f != nil {
+		fmt.Fprintln(f, cmd.Phrase)
+	}
+}
+
+func printTranscripts(transRec *vox.Recognizer, cmd *Command) {
 	for i, result := range transRec.FinalResults() {
 		fmt.Printf("transcript%d:%s\n", i+1, result.Text)
 	}
-	fmt.Println(action)
+	printCommand(cmd)
 }
 
 func handle(cmds []Command, phrases []vox.PhraseResult, transRec *vox.Recognizer, audio []byte) []Event {
@@ -153,11 +161,11 @@ func handle(cmds []Command, phrases []vox.PhraseResult, transRec *vox.Recognizer
 			if p == len(phrases)-1 {
 				events = append(events, Event{TranscribeEvent, c})
 			} else {
-				printTranscripts(transRec, c.Action)
+				printTranscripts(transRec, c)
 			}
 			break
 		}
-		fmt.Println(c.Action)
+		printCommand(c)
 	}
 	return events
 }
@@ -272,7 +280,7 @@ func main() {
 				panic(err.Error())
 			}
 			if finalized {
-				printTranscripts(transRec, transcribing.Action)
+				printTranscripts(transRec, transcribing)
 				transcribing = nil
 			}
 		}
