@@ -66,4 +66,4 @@ if ! [ "$speechless" ]; then
 fi
 
 "$libexec/instructor" < "$pipe" | "$libexec/handlers/$handler" &
-wait
+wait $!
