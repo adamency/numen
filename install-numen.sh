@@ -14,8 +14,6 @@ if ! [ "$PACKAGING" ]; then
 	! command -v gcc > /dev/null && echo 'you need gcc' && unset ok
 	! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
 	! command -v scdoc > /dev/null && echo 'you need scdoc' && unset ok
-	! command -v xdotool > /dev/null && echo 'you need xdotool' && unset ok
-	! command -v xset > /dev/null && echo 'you need xset' && unset ok
 	[ "$ok" ] || exit
 
 	if ! dotool --version >/dev/null 2>&1; then

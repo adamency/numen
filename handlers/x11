@@ -35,6 +35,14 @@ myxdotool() {
 	done
 }
 
+if ! command -v xdotool >/dev/null; then
+	echo 'numen: the x11 handler requires the xdotool command' >&2
+	exit 1
+elif ! command -v xset >/dev/null; then
+	echo 'numen: the x11 handler requires the xset command' >&2
+	exit 1
+fi
+
 while IFS= read -r line; do
 	line="${line#local}"
 	if prefixed "$line" key; then
