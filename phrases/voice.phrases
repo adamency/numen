@@ -39,14 +39,14 @@ localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt
 @transcribe cam scribe:set fmt echo camel\
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 # UpperCamelCase
-@transcribe cam transcribe:set fmt echo uppercamel\
+@transcribe camel scribe:set fmt echo uppercamel\
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 
 # Erase the transcription
 nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
 
 # Go to the start of the transcription
-return:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
+initial:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
 
 # Menu of transcription results
 # (Requires the dmenu command)

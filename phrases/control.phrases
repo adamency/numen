@@ -44,7 +44,7 @@ end:press End
 # Paste the clipboard (depending on the program)
 @rapidoff pastry:unstick press XF86Paste
 
-again:repeat 1
+more:repeat 1
 double:repeat 2
 handful:repeat 4
 fistful:repeat 8
