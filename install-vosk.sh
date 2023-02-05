@@ -1,5 +1,5 @@
 #!/bin/sh
-version=0.3.42
+version=0.3.45
 vosk_file="vosk-linux-$(uname -m)-$version"
 model=vosk-model-small-en-us-0.15
 model_name=small-en-us

@@ -3,7 +3,7 @@ module git.sr.ht/~geb/numen
 go 1.19
 
 require (
-	git.sr.ht/~geb/vox v0.0.0-20230118165144-3ffb8cd4de9f
+	git.sr.ht/~geb/vox v0.0.0-20230205104208-a456039f6c9c
 	github.com/go-audio/wav v1.1.0
 )
 
