@@ -1,7 +1,7 @@
 #!/bin/sh
-version=1.1
+version=1.2
 distfile="https://git.sr.ht/~geb/dotool/archive/$version.tar.gz"
-checksum=484bd2fac9f73c61b36b83086ce51fc69c60a99aa149e6e96fe413fa27747281
+checksum=80dcbc1bc4877bbef3eb30cb8c0ad7db161fb76d4999bb9b5f4a484e2267e5a1
 
 ok=1
 ! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
