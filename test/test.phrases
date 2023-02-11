@@ -1,0 +1,4 @@
+eve:eval echo e >&2
+made:eval echo m >&2
+nerd:eval echo n >&2
+urge:eval echo u >&2
