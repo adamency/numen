@@ -28,6 +28,9 @@ environment or virtual console.
 	Specify an audio file to use instead of the microphone.  This isn't for
 	normal use, and the correct audio format depends on the language model.
 
+*--audiolog=*_FILE_
+	Write the audio to _FILE_ while it's recorded.
+
 *-h*, *--help*
 	Print help and exit.
 

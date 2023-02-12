@@ -5,15 +5,17 @@ if ! command -v arecord > /dev/null; then
 	exit 1
 fi
 
-handler=kernel audio= mic= phraselog= speechless=
-args="$(getopt -n numen -o h -l audio:,help,gadget,kernel,list-mics,mic:,phraselog:,speechless,version,x11 -- "$@")" || exit
+handler=kernel audio= audiolog= mic= phraselog= speechless=
+args="$(getopt -n numen -o h -l audio:,audiolog:,help,gadget,kernel,list-mics,mic:,phraselog:,speechless,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
 	--audio) audio="$2"; shift 2;;
+	--audiolog) audiolog="$2"; shift 2;;
 	-h|--help) echo "numen [PHRASE_FILE...]
 
 --audio=FILE     Specify an audio file to use instead of the microphone.
+--audiolog=FILE  Write the audio to FILE while it's recorded.
 --gadget         Use the gadget handler to perform the actions over USB.
 --kernel         Use the kernel handler to perform the actions (the default).
 --list-mics      List audio devices and exit.
@@ -60,15 +62,13 @@ export NUMEN_SHELL="${NUMEN_SHELL:-/bin/sh}"
 
 libexec=/usr/libexec/numen
 if ! [ "$speechless" ]; then
+	: "${audiolog:=/dev/null}"
+	: "${phraselog:=/dev/null}"
 	if [ "$audio" ]; then
 		"$libexec/speech" "$model" "$@" < "$audio" | "$libexec/scribe" > "$pipe" &
 	else
-		if [ "$phraselog" ]; then
-			{ "$libexec/record" "$mic" | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe"; } 3> "$phraselog" &
-		else
-			"$libexec/record" "$mic" | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe" &
-		fi
-	fi
+		"$libexec/record" "$mic" | tee /dev/fd/3 | "$libexec/speech" "$model" "$@" | "$libexec/scribe" > "$pipe" &
+	fi 3> "$audiolog" 4> "$phraselog"
 fi
 
 "$libexec/instructor" < "$pipe" | "$libexec/handlers/$handler" &

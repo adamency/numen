@@ -111,7 +111,7 @@ type Event struct {
 
 func printCommand(cmd *Command) {
 	fmt.Println(cmd.Action)
-	f := os.NewFile(3, "/dev/fd/3")
+	f := os.NewFile(4, "/dev/fd/4")
 	if f != nil {
 		fmt.Fprintln(f, cmd.Phrase)
 	}
