@@ -60,6 +60,9 @@ environment or virtual console.
 	Don't do speech recognition. This this is useful with *numenc* to just
 	perform actions programmatically.
 
+*--verbose*
+	Show what is being used.
+
 *--version*
 	Print the version and exit.
 

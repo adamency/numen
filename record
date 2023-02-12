@@ -10,6 +10,10 @@ elif arecord -L | grep -qx sysdefault:CARD=Microphone; then
 	mic=sysdefault:CARD=Microphone
 fi
 
+if [ "$NUMEN_VERBOSE" ]; then
+	printf %s\\n "Microphone: $mic" >&2
+fi
+
 t="$(date +%s)"
 arecord -q -D "$mic" -f S16_LE -c 1 -r 16000
 [ "$(($(date +%s) - t))" -lt 2 ] && exit 1

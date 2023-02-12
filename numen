@@ -6,7 +6,7 @@ if ! command -v arecord > /dev/null; then
 fi
 
 handler=kernel audio= audiolog= mic= phraselog= speechless=
-args="$(getopt -n numen -o h -l audio:,audiolog:,help,gadget,kernel,list-mics,mic:,phraselog:,speechless,version,x11 -- "$@")" || exit
+args="$(getopt -n numen -o h -l audio:,audiolog:,help,gadget,kernel,list-mics,mic:,phraselog:,speechless,verbose,version,x11 -- "$@")" || exit
 eval set -- "$args"
 while :; do
 	case "$1" in
@@ -22,6 +22,7 @@ while :; do
 --mic=NAME       Select the audio device.
 --speechless     Don't do speech recognition (to just send actions with numenc).
 --phraselog=FILE Write phrases to FILE when they are performed.
+--verbose        Show what is being used.
 --version        Print the version and exit.
 --x11            Use the X11 handler to perform the actions."; exit;;
 	--kernel) handler=kernel; shift;;
@@ -30,6 +31,7 @@ while :; do
 	--mic) mic="$2"; shift 2;;
 	--phraselog) phraselog="$2"; shift 2;;
 	--speechless) speechless=1; shift;;
+	--verbose) export NUMEN_VERBOSE=1; shift;;
 	--version) printf %s\\n "$NUMEN_VERSION"; exit;;
 	--x11) handler=x11; shift;;
 	--) shift; break;;
@@ -45,8 +47,12 @@ if [ $# = 0 ]; then
 fi
 
 mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/numen/mods"
-pipe="${NUMEN_PIPE:-/tmp/numen_pipe}"
 model="${NUMEN_MODEL:-model}"
+pipe="${NUMEN_PIPE:-/tmp/numen_pipe}"
+
+if [ "$NUMEN_VERBOSE" ]; then
+	printf %s\\n "Model: $model" "Pipe: $pipe" >&2
+fi
 
 if [ -p "$pipe" ] && /bin/echo 1<>"$pipe" >"$pipe"; then
 	echo "numen: another instance is already reading the pipe: $pipe" >&2
