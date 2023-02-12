@@ -6,19 +6,23 @@ It works system-wide on your Linux machine.
 A short demonstration can be found on:
 [https://numenvoice.com](https://numenvoice.com)
 
-## Installation From Source
+## Install From Source
 
-`go` (>=1.19) is required.
+`go` (sometimes packaged as `golang`) is required.
 
-The [speech recognition library](https://alphacephei.com/vosk) and an english
-language model (about 40MB) can be installed with `sudo ./install-vosk.sh`.
-If this throws a 404 error, the Vosk team hasn't provided a binary for
-your architecture.
+The [speech recognition library](https://alphacephei.com/vosk) and an English
+model (about 40MB) can be installed with:
 
-The standard mode requires the [dotool](https://sr.ht/~geb/dotool) command,
-which can be installed with `sudo ./install-dotool.sh`.
+    sudo ./install-vosk.sh && sudo ./install-model.sh
 
-Finally, `numen` itself can be installed with `sudo ./install-numen.sh`.
+The [dotool](https://sr.ht/~geb/dotool) command which is used to simulate
+input, can be installed with:
+
+    sudo ./install-dotool.sh
+
+Finally, `numen` itself can be installed with:
+
+    sudo ./install-numen.sh
 
 ## Permission
 
