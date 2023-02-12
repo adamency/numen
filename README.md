@@ -26,13 +26,18 @@ Finally, `numen` itself can be installed with:
 
 ## Permission
 
-The standard mode requires permission to /dev/uinput to create the virtual
-input device.  This permission is granted to users in group input, which
-your user is likely in already.
+`dotool` requires permission to `/dev/uinput` to create the virtual input
+devices, and the udev rule grants this to users in group input.
 
-If numen does complain about permission, you could give your user permission
-by running:<br>
-	`sudo ./install-user-udev-rule.sh`
+You could check the output of `groups` or just try:
+
+    echo type hello | dotool
+
+If need be, you can run:
+
+    sudo usermod -a -G input $USER
+
+and re-login and trigger the udev rule, or just reboot.
 
 ## Getting Started
 
