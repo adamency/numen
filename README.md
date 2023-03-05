@@ -65,7 +65,7 @@ Now you can have a go in your text editor, the default phrases are in the
 I use numen for all my computing and stick to keyboard-based programs like
 [Neovim](https://neovim.io) and [qutebrowser](https://qutebrowser.org), my text
 editor and browser.  I also use a minimal desktop environment I wrote called
-[tiles](https://git.sr.ht/~geb/tiles) that doesn't require a pointer device.
+[Tiles](https://git.sr.ht/~geb/tiles) that doesn't require a pointer device.
 
 ## Contact and Matrix Chat
 
@@ -74,6 +74,12 @@ You can send questions, thoughts or patches by composing an email to
 
 You're also welcome to join our Matrix chat at
 [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
+
+## See Also
+
+* [Tiles](https://git.sr.ht/~geb/tiles) - A minimal desktop environment
+  suitable for voice control.
+* [Hiccup](https://git.sr.ht/~geb/hiccup) - Noise input for playing games.
 
 ## Support Me
 
