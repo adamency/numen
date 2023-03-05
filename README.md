@@ -29,12 +29,13 @@ Finally, `numen` itself can be installed with:
 `dotool` requires permission to `/dev/uinput` to create the virtual input
 devices, and a udev rule grants this to users in group input.
 
-You could check the output of `groups` or just try:
+You could try:
 
     echo type hello | dotool
 
-If need be, you can run:
+and if need be, you can run:
 
+    sudo groupadd -f input
     sudo usermod -a -G input $USER
 
 and re-login and trigger the udev rule or just reboot.
@@ -45,14 +46,18 @@ Once you've got a microphone, you can run it with:
 
     numen
 
-There normally isn't any output but you should be able to type "hey" by
-saying "hoof eve yank" and transcribe a sentence after saying "scribe".
-You can terminate it by pressing Ctrl+c or saying "troll cap".
+There shouldn't be any output but you should be able to type "hey" by saying
+"hoof eve yank" and transcribe a sentence after saying "scribe".  You can
+terminate it by pressing Ctrl+c which is "troll cap".
 
-If nothing happened, you might need to specify the right audio device with
-the `--mic` option.  See `numen --list-mics` for what's available.
+If nothing happened, check it's using the right audio device with:
 
-Have a go in your text editor, the default phrases are in the
+    timeout 5 numen --verbose --audiolog=me.wav
+    aplay me.wav
+
+and specify a `--mic` from `--list-mics` if not.
+
+Now you can have a go in your text editor, the default phrases are in the
 `/etc/numen/phrases` directory.
 
 ## Going Further
