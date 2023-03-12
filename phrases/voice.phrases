@@ -49,8 +49,8 @@ nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Back
 initial:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
 
 # Menu of transcription results
-# (Requires the dmenu command)
+# (Requires the dmenu command or $NUMEN_DMENU or $DMENU)
 transcripts:eval /usr/libexec/numen/phrases/transcripts "$fmt" &
 # Menu to change transcription result
-# (Requires the dmenu command)
+# (Requires the dmenu command or $NUMEN_DMENU or $DMENU)
 change:eval /usr/libexec/numen/phrases/transcripts "$fmt" change &

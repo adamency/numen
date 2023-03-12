@@ -1,12 +1,14 @@
 #!/bin/sh
 # transcripts FORMAT [CHANGE]
+dmenu="${NUMEN_DMENU:-"${DMENU:-dmenu}"}"
+dmenu_opts="${NUMEN_DMENU_OPTS:--i -l 10}"
 
 export DISPLAY="$(/usr/libexec/numen/phrases/displaying)"
 
 f="${XDG_DATA_HOME:-$HOME/.local/share}/numen/transcripts"
 if [ "$2" ]; then
 	if [ "$(wc -l < "$f")" -gt 1 ]; then
-		if transcript="$(tail -n +2 "$f" | /usr/libexec/numen/phrases/fmt "$1" | dmenu -i -l 10)"; then
+		if transcript="$(tail -n +2 "$f" | /usr/libexec/numen/phrases/fmt "$1" | "$dmenu" $dmenu_opts)"; then
 			awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
 			printf 'type %s\n' "$transcript"
 		fi
@@ -14,7 +16,7 @@ if [ "$2" ]; then
 		notify-send 'No alternative transcripts' &
 	fi
 elif [ -s "$f" ]; then
-	printf 'type %s\n' "$(/usr/libexec/numen/phrases/fmt "$1" < "$f" | dmenu -i -l 10)"
+	printf 'type %s\n' "$(/usr/libexec/numen/phrases/fmt "$1" < "$f" | "$dmenu" $dmenu_opts)"
 else
 	notify-send 'No transcripts' &
 fi
