@@ -48,7 +48,7 @@ environment or virtual console.
 	rule effective without rebooting by running: *sudo udevadm trigger*.
 
 *--list-mics*
-	List audio devices and exit.
+	List audio devices and exit. The same as *arecord -L*.
 
 *--mic=*_NAME_
 	Select the audio device.

@@ -1,11 +1,10 @@
 #!/bin/sh
 # record [MICROPHONE]
-# Outputs microphone audio formatted well for the language model.
+# Outputs microphone audio.
 
 mic=default
 if [ "$1" ]; then
-	mic="$1"; shift
-	[ "$mic" = "${mic#*CARD=}" ] && mic="sysdefault:CARD=$mic"
+	mic="$1"
 elif arecord -L | grep -qx sysdefault:CARD=Microphone; then
 	mic=sysdefault:CARD=Microphone
 fi
