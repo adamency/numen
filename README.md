@@ -4,7 +4,7 @@ Numen is voice control for computing without a keyboard or mouse,
 and works system-wide on your Linux machine.
 
 There's a short demonstration on:
-[https://numenvoice.com](https://numenvoice.com)
+[https://numenvoice.org](https://numenvoice.org)
 
 ## Install From Source
 
