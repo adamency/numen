@@ -22,6 +22,17 @@ The actions can be performed for different environments.  By default, a
 virtual device is simulated at a low enough level to work in any graphical
 environment or virtual console.
 
+# KEYBOARD LAYOUTS
+
+Please note, *dotool*, the default command used to simulate input, will
+type gobbledygook if your environment has assigned it a different keyboard
+layout than it's simulating keycodes for.  You can match them up by setting
+the environment variables *DOTOOL_XKB_LAYOUT* and *DOTOOL_XKB_VARIANT*.
+
+For example, if you use the French *fr* layout:
+
+	*DOTOOL_XKB_LAYOUT=fr numen*
+
 # OPTIONS
 
 *--audio=*_FILE_

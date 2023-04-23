@@ -1,12 +1,13 @@
 #!/bin/sh
-version=90184107489abb7a440bf1f8df9b123acc8f9628
+version=7b38f27d30581b2ba2a75c079502fdc118e4bf57
 distfile="https://git.sr.ht/~geb/dotool/archive/$version.tar.gz"
-checksum=9f5ff7513307f0829b75f43a3fd0f3929747cddcc83904ee066fc578b4b15492
+checksum=6a9156bdf8bb6405615733e14cf22f6f5e91c4006799b5e9770d09e08633bda0
 
 ok=1
 ! command -v go > /dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
 ! command -v tar > /dev/null && echo 'you need tar' && unset ok
 ! command -v wget > /dev/null && echo 'you need wget' && unset ok
+! test -d /usr/include/xkbcommon && echo 'you need libxkbcommon-dev' && unset ok
 [ "$ok" ] || exit
 
 rm -rf tmp && mkdir -p tmp && cd tmp || exit

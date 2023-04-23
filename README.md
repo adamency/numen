@@ -67,6 +67,16 @@ I use numen for all my computing and stick to keyboard-based programs like
 editor and browser.  I also use a minimal desktop environment I wrote called
 [Tiles](https://git.sr.ht/~geb/tiles) that doesn't require a pointer device.
 
+## Keyboard Layouts
+
+dotool will type gobbledygook if your environment has assigned it a different
+keyboard layout than it's simulating keycodes for.  You can match them up by
+setting the environment variables `DOTOOL_XKB_LAYOUT` and `DOTOOL_XKB_VARIANT`.
+
+For example, if you use the French `fr` layout:
+
+    DOTOOL_XKB_LAYOUT=fr numen
+
 ## Contact and Matrix Chat
 
 You can send questions, thoughts or patches by composing an email to
