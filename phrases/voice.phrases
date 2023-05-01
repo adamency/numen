@@ -10,10 +10,10 @@
 # Transcribe a sentence formatted...
 
 # With the first letter uppercase
-@transcribe transcribe:set numen_fmt echo sentence\
+@transcribe scrub:set numen_fmt echo sentence\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # With Each First Letter Uppercase
-@transcribe title scribe:set numen_fmt echo title\
+@transcribe tight scribe:set numen_fmt echo title\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # ALL UPPERCASE
 @transcribe shout scribe:set numen_fmt echo upper\
@@ -30,6 +30,9 @@
 # with.dots.inbetween
 @transcribe dot scribe:set numen_fmt echo dot\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
+# with, commas, inbetween
+@transcribe row scribe:set numen_fmt echo list\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # with/slashes/inbetween
 @transcribe path scribe:set numen_fmt echo path\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
@@ -40,14 +43,14 @@
 @transcribe cam scribe:set numen_fmt echo camel\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # UpperCamelCase
-@transcribe camel scribe:set numen_fmt echo uppercamel\
+@transcribe cam scrub:set numen_fmt echo uppercamel\
 	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 
 # Erase the transcription
-nevermind:eval /etc/numen/scripts/transcripts | sed 's/./ BackSpace/g; s/^/press/; q'
+ditch:eval /etc/numen/scripts/transcripts | sed 's/./ BackSpace/g; s/^/press/; q'
 
 # Go to the start of the transcription
-initial:eval /etc/numen/scripts/transcripts | sed 's/./ Left/g; s/^/press/; q'
+trudge:eval /etc/numen/scripts/transcripts | sed 's/./ Left/g; s/^/press/; q'
 
 # Menus to type or choose another transcription result
 # They use the dmenu command (only works in X11) or the command specified

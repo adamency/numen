@@ -46,9 +46,9 @@ Once you've got a microphone, you can run it with:
 
     numen
 
-There shouldn't be any output but you should be able to type "hey" by saying
-"hoof eve yank" and transcribe a sentence after saying "scribe".  You can
-terminate it by pressing Ctrl+c which is "troll cap".
+There shouldn't be any output but you should be able to type *hey* by saying
+"hoof each yank". You can also try transcribing a sentence after saying
+"scribe", and terminate it by pressing Ctrl+c (a.k.a "troy cap").
 
 If nothing happened, check it's using the right audio device with:
 

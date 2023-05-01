@@ -28,17 +28,9 @@ screen:stick off\
 
 
 
-# I bind these to navigate in-app windows
-fall:press alt+Down
-rise:press alt+Up
-small:press alt+Left
-large:press alt+Right
-
-
-
 # These two are just for --gadget mode.
 
 # Switch to controlling the gadget
-@gadget suck gadget:handler uinput
-# Switch to controlling the receiving machine
-@gadget suck host:handler gadget
+@gadget shock gadget:handler uinput
+# Switch to controlling the host machine
+@gadget shock host:handler gadget

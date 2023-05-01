@@ -234,12 +234,13 @@ variable *NUMEN_MODEL* to specify the path to the model directory.
 
 # EXAMPLES
 
-Run *numen* using the default phrases in */etc/numen/phrases/*:
+Run *numen* with the default phrases:
 
-	*$ numen*
+	*$ numen /etc/numen/phrases/\*.phrases*
 
-You can try saying "hoof eve yank" and "scribe so this is a sentence" into
-your microphone, and terminate it by pressing *Ctrl*+*c* a.k.a "troll cap".
+There shouldn't be any output but you should be able to type *hey* by saying
+"hoof each yank". You can also try transcribing a sentence after saying
+"scribe", and terminate it by pressing Ctrl+c (a.k.a "troy cap").
 
 Check the microphone:
 
