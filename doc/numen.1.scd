@@ -6,38 +6,39 @@ numen(1)
 
 # SYNOPSIS
 
-*numen* [*--gadget*|*--kernel*|*--x11*] [*--mic=*_NAME_] [_FILE_...]++
+*numen* [*--gadget*|*--uinput*|*--x11*] [*--mic=*_NAME_] [_FILE_...]++
 *numen* *--help*
 
 # DESCRIPTION
 
-*numen* reads phrases and corresponding actions from one or more files and
-performs the actions when you say the phrases.
+*numen* reads phrases and actions from one or more files, and performs the
+actions when you say their phrases.
 
-When no files are passed as arguments, *numen* reads the files ending
-with .phrases in *$XDG_CONFIG_HOME/numen/phrases/* else */etc/numen/phrases/*.
-(*$XDG_CONFIG_HOME* is *~/.config* unless set otherwise.)
+With no arguments, *numen* uses the default phrases in the
+*/etc/numen/phrases/* directory, unless you've put files ending with *.phrases*
+in the *$XDG_CONFIG_HOME/numen/phrases/* directory. (*$XDG_CONFIG_HOME*
+is *~/.config* unless set otherwise.)
 
-The actions can be performed for different environments.  By default, a
-virtual device is simulated at a low enough level to work in any graphical
-environment or virtual console.
+There is also the *numenc* command to trigger actions programmatically.
 
-# KEYBOARD LAYOUTS
+# DOTOOL AND KEYBOARD LAYOUTS
 
-Please note, *dotool*, the default command used to simulate input, will
-type gobbledygook if your environment has assigned it a different keyboard
-layout than it's simulating keycodes for.  You can match them up by setting
-the environment variables *DOTOOL_XKB_LAYOUT* and *DOTOOL_XKB_VARIANT*.
+The default handler uses the *dotool* command to simulate input anywhere
+(X11, Wayland, TTYs) but it usually requires your user to be in group *input*
+(see *dotool --help*).
 
-For example, if you use the French *fr* layout:
+If you use a non-us-qwerty keyboard layout, you can set the environment
+variables *DOTOOL_XKB_LAYOUT* and *DOTOOL_XKB_VARIANT* to have *dotool*
+simulate the right keys. For example, if you use the French *fr* layout:
 
 	*DOTOOL_XKB_LAYOUT=fr numen*
 
 # OPTIONS
 
 *--audio=*_FILE_
-	Specify an audio file to use instead of the microphone.  This isn't for
-	normal use, and the correct audio format depends on the language model.
+	Specify an audio file to use instead of the microphone. This isn't
+	for normal use, and the correct audio format depends on the speech
+	recognition model.
 
 *--audiolog=*_FILE_
 	Write the audio to _FILE_ while it's recorded.
@@ -46,30 +47,21 @@ For example, if you use the French *fr* layout:
 	Print help and exit.
 
 *--gadget*
-	Perform the actions over USB. This requires the *gadget* command
-	(https://git.sr.ht/~geb/gadget). The *pen* and *eval* actions, that
-	usually run commands, instead send actions over the serial port,
-	but it seems too unreliable currently.
+	Simulate the input over USB using the *gadget* command
+	(https://git.sr.ht/~geb/gadget).
 
-*--kernel*
-	The default mode, perform the actions at a low enough level to work in
-	any graphical environment or virtual console.  This requires permission
-	to */dev/uinput* which the udev rule installed with numen grants to
-	users in group *input*.  If you just installed numen, you can make the
-	rule effective without rebooting by running: *sudo udevadm trigger*.
+*--uinput*
+	Simulate the input system-wide using the *dotool* command (see the
+	section above). This is the default.
 
 *--list-mics*
 	List audio devices and exit. The same as *arecord -L*.
 
-*--mic=*_NAME_
-	Select the audio device.
+*--mic=*_AUDIO_DEVICE_
+	Specify the audio device. Like *arecord -D*.
 
 *--phraselog=*_FILE_
-	Write phrases to _FILE_ when they are performed.
-
-*--speechless*
-	Don't do speech recognition. This this is useful with *numenc* to just
-	perform actions programmatically.
+	Write phrases to _FILE_ while they're performed.
 
 *--verbose*
 	Show what is being used.
@@ -78,42 +70,41 @@ For example, if you use the French *fr* layout:
 	Print the version and exit.
 
 *--x11*
-	Perform the actions for an X11 graphical environment.  This is more
-	limited than *--kernel* but requires less permissions.
+	Simulate the input for X11 using the *xdotool* and *xset* commands.
 
 # CONFIGURATION
 
-Each line of the files goes:
+Phrase files consist of lines mapping phrases to actions. The format is:
 
-\[*@*_TAG_...] _PHRASE_:_ACTIONS_
+\[*@*_TAG_...] _PHRASE_:_ACTION_
 
-That is, there can be zero or more "tags" each starting with *@*, then the
-phrase, then a *:* and the actions.  Empty lines and lines starting with *#*
-are ignored.  The *:* can be omitted if there are no actions.
+That is, there can be zero or more "tags" starting with *@*, then the phrase,
+then a *:* and the action. If a line ends with a backslash, the next line is
+taken as another action. Empty lines and lines starting with *#* are ignored.
 
-The words of the phrases must be known to the language model or you'll be
-informed by an error.
+Phrases with words unknown to the speech recognition model are ignored with
+a warning.
 
-Actions can come directly after other actions that don't use the rest of
-the line.  Multiple actions can be spread over multiple lines by ending each
-with a backslash.  The supported actions are:
+## ACTIONS
 
-*press* _CHORD_ [_CHORD_...]
-	Simulate each _CHORD_, for example: *press ctrl+c Up*++
-The key names are the X11 keysyms, which you can find with the *xev* command.
-	Not all keys are supported yet in all modes.
+*press* [_CHORD_...]
+	Simulate each _CHORD_. For example, to cycle round splits in Vim:
+
+	*switch: press ctrl+w w*
+
+	The key names are the XKB keys names which you can find with *dotool
+	\--list-x-keys*.  The modifiers are *super*, *ctrl*, *alt* and *shift*.
 
 *type* _TEXT_
-	Simulate typing the rest of the line, for example:++
-*type Hello, World!*
+	Simulate typing _TEXT_.
 
-*mod* *shift*/*ctrl*/*alt*/*super*
+*mod* *super*/*ctrl*/*alt*/*shift*
 	Enable a modifier for the next press.
 
 *mod* *clear*
 	Clear all modifiers.
 
-*capson*/*capsoff*
+*caps* *on*/*off*
 	Enable/disable Caps Lock.
 
 *mouseto* _X_ _Y_
@@ -121,118 +112,143 @@ The key names are the X11 keysyms, which you can find with the *xev* command.
 	between 0.0 and 1.0.
 
 *mousemove* _X_ _Y_
-	Move the cursor _X_ _Y_ pixels relative to its current position.
+	Move the cursor relative to its current position.
 
 *click* *left*/*middle*/*right*
 	Simulate a mouse click.
 
-*scrollup*/*scrolldown*
-	Simulate scrolling a mouse wheel.
+*wheel* _AMOUNT_
+	Simulate a (vertical) mouse wheel. A positive _AMOUNT_ is up,
+	negative is down.
 
-*stick*
-	Make presses not keyup until *unstick*, like holding down a key at
-	a time.  If already sticking, keyup but keep sticking.
+*hwheel* _AMOUNT_
+	Simulate a horizontal mouse wheel. A positive _AMOUNT_ is right,
+	negative is left.
 
-*unstick*
+*stick* *on*
+	Make presses not keyup, like holding down a key at a time.  If already
+	sticking, keyup but keep sticking.
+
+*stick* *off*
 	Keyup and stop sticking.
 
-*repeat* _NUMBER_
-	Repeat the previous *press*/*pen* the _NUMBER_ of times.
+*repeat* _TIMES_
+	Repeat the previous *click*, *mousemove*, *mouseto*, *pen*, *press*,
+	*run*, *type*, *wheel* or *hwheel* however many _TIMES_.
+
+*run* _COMMAND_
+	Run a shell command. For example:
+
+	*hi: run notify-send "Greetings, I'm a notification!"*
 
 *pen* _COMMAND_
-	Execute the rest of the line in the shell and type any stdout.
-	An example that types the date: *pen date +%D*
+	Type the output of a shell command. For example, to type the date:
 
-*localpen* _COMMAND_
-	The same as *pen* except in *--gadget* mode where this runs the command
-	on the gadget rather than sending the action to the receiving machine.
+	*date: pen date +%D*
 
 *eval* _COMMAND_
-	Reinterpret the rest of the line as the stdout it produces when shell
-	evaluated.  An example that backspaces the previously typed text:++
-*eval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(; n--; n) print "press BackSpace"}'*
+	Perform the output of a shell command as actions. For example,
+	to backspace a transcription:
 
-*localeval* _COMMAND_
-	The same as *eval* except in *--gadget* mode where this runs the
-	command on the gadget rather than sending the action to the receiving
-	machine.
+	*ditch: eval "$NUMEN_STATE_DIR/transcripts" | sed 's/./ BackSpace/g; s/^/press/; q'*
 
-*set* _ENVIRONMENT_VARIABLE_ _COMMAND_
-	Set _ENVIRONMENT_VARIABLE_ to the stdout the rest of the line produces
-	when shell evaluated.  An example that tweaks *numen*:++
-*set NUMEN_TYPE_DELAY echo 20*
+*set* _ENV_VAR_ _COMMAND_
+	Set an environment variable to the output of a shell command.
 
-*handler* *gadget*/*kernel*/*x11*
-	Change between the *--gadget*, *--kernel* and *--x11* modes.
+*load* [_FILE_...]
+	Switch to different phrase files, or pause *numen* by loading no
+	files. For example, you can pause and resume *numen* programmatically
+	using the *numenc* command:
 
-Tags have phrases act specially.  Unsupported tags are silently ignored.
-The supported tags are:
+	*$ echo load | numenc*++
+*...*++
+*$ echo load /etc/numen/phrases/\*.phrases | numenc*
+
+*handler* *gadget*/*uinput*/*x11*
+	Change between the *--gadget*, *--uinput* and *--x11* modes.
+
+*keydelay* _MILLISECONDS_/*reset*
+	Set the time between *press* keys.
+
+*keyhold* _MILLISECONDS_/*reset*
+	Set the time *press* keys are held.
+
+*typedelay* _MILLISECONDS_/*reset*
+	Set the time between *type*/*pen* keys.
+
+*typehold* _MILLISECONDS_/*reset*
+	Set the time *type*/*pen* keys are held.
+
+## TAGS
+
+Tags have phrases act specially.
 
 *@cancel*
 	Cancel the preceding phrases.
 
 *@transcribe*
-	Instead of performing phrases, listen till the next pause, then
-	set the environment variable *NUMEN_TRANSCRIPT* to the speech
-	recognition result and perform the action.  This example would
-	transcribe what you say in UPPERCASE:++
-*@transcribe scream:pen echo $NUMEN_TRANSCRIPT | tr '[:lower:]' '[:upper:]'*
+	Do literal speech recognition until the next silence, record the
+	results in *$NUMEN_STATE_DIR/transcripts*, and only then perform
+	the action. For example, to type the top result:
 
-*@rapidon* and *@rapidoff*
-	*@rapidon* has phrases performed early instead at the next pause,
-	until a phrase tagged *@rapidoff*.  This is useful to shorten the
-	response time in *sticky* mode but reduces recognition accuracy.
+	*@transcribe scribe: pen head -n 1 $NUMEN_STATE_DIR/transcripts*
 
-*@gadget* *@kernel* *@x11*
-	Only listen for the phrase if performing the actions using one of
-	the tagged modes.
+*@gadget* *@uinput* *@x11*
+	If a phrase is tagged with any of these, ignore it unless *numen*
+	was started in one of their modes.
+
+# SPECIAL PHRASES
+
+The special phrase *<complete>* is performed after each sentence is performed.
+For example, to turn off Caps Lock at the end of each sentence:
+
+	*<complete>: caps off*
 
 # ENVIRONMENT VARIABLES
 
-*numen* can be tweaked by some environment variables, which can even be set
-by the *set* action:
+*numen* can be tweaked by some environment variables:
 
-- *NUMEN_SHELL* sets the shell used for *pen* and *eval* actions.
-- *NUMEN_KEY_DELAY* sets the delay between keys with the *press* action.
-- *NUMEN_KEY_HOLD* sets the time keys are held with the *press* action.
-- *NUMEN_TYPE_DELAY* sets the delay between keys with the *type* and *pen*
-  actions.
-- *NUMEN_TYPE_HOLD* sets the time keys are held with the *type* and *pen*
-  actions.
+- *NUMEN_KEY_DELAY*, *NUMEN_KEY_HOLD*, *NUMEN_TYPE_DELAY* and *NUMEN_TYPE_HOLD*
+  are like their corresponding actions but at startup.
+- *NUMEN_SHELL* sets the shell used for shell commands, instead of */bin/sh*.
 
-When *numen* executes a shell command, it provides some environment variables
-exposing *numen*'s state:
+# STATE FILES
 
-- *NUMEN_HANDLER* is *gadget*, *kernel* or *x11*.
-- *NUMEN_TEXT* is the last *type*/*pen* text.
-- *NUMEN_TRANSCRIPT* is the literal sentence from a *@transcribe* phrase.
-- *NUMEN_SUPER*, *NUMEN_CTRL*, *NUMEN_ALT* and *NUMEN_SHIFT* are either *0*
-  or *1* describing each modifier's state.
+*numen* exposes some of its state in files in the *$NUMEN_STATE_DIR* directory.
+*numen* will set *$NUMEN_STATE_DIR* to the default (*$XDG_STATE_HOME/numen*)
+if not set otherwise, for convenience in actions.  (*$XDG_STATE_HOME* is
+*~/.local/state* unless set otherwise.)
 
-# DATA FILES
+- *$NUMEN_STATE_DIR/handler* contains *gadget*, *uinput* or *x11* depending
+  on the mode.
+- *$NUMEN_STATE_DIR/mods* contains the state of the modifier keys.
+- *$NUMEN_STATE_DIR/phrase* contains the previous phrase.
+- *$NUMEN_STATE_DIR/transcripts* contains the results of the *@transcribe* tag.
 
-The file *$XDG_DATA_HOME/numen/transcripts* is overwritten to the latest
-transcription results.
+# DIFFERENT MODELS AND LANGUAGES
 
-The directory *$XDG_DATA_HOME/numen/mods/* has files of the state of each
-modifier, containing either *0* or *1*.
-
-(*$XDG_DATA_HOME* is *~/.local/share/* unless set otherwise.)
+Properly supporting/testing different speech recognition models and spoken
+languages is on the todo list, but *numen* should work with any of the *small*
+models from *https://alphacephei.com/vosk/models*. Use the environment
+variable *NUMEN_MODEL* to specify the path to the model directory.
 
 # EXAMPLES
 
 Run *numen* using the default phrases in */etc/numen/phrases/*:
 
-	*numen*
+	*$ numen*
 
 You can try saying "hoof eve yank" and "scribe so this is a sentence" into
-your microphone, and terminate it by pressing *Ctrl*+*c* or saying "troll cap".
+your microphone, and terminate it by pressing *Ctrl*+*c* a.k.a "troll cap".
 
-# BUGS
+Check the microphone:
 
-The implementation of phrases with multiple words is a kludge as internally
-the speech recognition can only be constrained to words not phrases, and
-*numen* can only abort if the result contains broken up phrases.
+	*$ timeout 5 numen --verbose --audiolog=me.wav++
+$ aplay me.wav*
+
+Run *numen* printing the phrases while they're performed:
+
+	*$ numen --phraselog=/dev/stdout*
 
 # AUTHOR
 

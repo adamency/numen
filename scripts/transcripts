@@ -1,8 +1,9 @@
 #!/bin/sh
-# fmt FORMAT
+# transcripts
+# Prints the transcripts formatted.
 
-sed "s/^i /I /; s/ i / I /g; s/ i$/ I/; s/i'/I'/g" |
-case "$1" in
+sed "s/^i /I /; s/ i / I /g; s/ i$/ I/; s/i'/I'/g" "$NUMEN_STATE_DIR/transcripts" |
+case "$numen_fmt" in
 	sentence) awk '{print toupper(substr($0,1,1))substr($0,2)}';;
 	title) awk '{for(i=1; i<=NF; i++) $i = toupper(substr($i,1,1))substr($i,2); print}';;
 	upper) tr '[:lower:]' '[:upper:]';;
@@ -10,6 +11,7 @@ case "$1" in
 	uppersnake) tr '[:lower:]' '[:upper:]' | sed 's/ /_/g';;
 	dash) sed 's/ /-/g';;
 	dot) sed 's/ /./g';;
+	list) sed 's/ /, /g';;
 	path) sed 's: :/:g';;
 	smash) sed 's/ //g';;
 	camel) awk '{for(i=1; i<=NF; i++) printf "%s", (i == 1 ? $i : toupper(substr($i,1,1))tolower(substr($i,2))); print ""}';;

@@ -1,15 +1,18 @@
-# I recommend https://git.sr.ht/~geb/coord for clicking points on the screen.
-
+# I use keyboard-focused programs so I rarely need to click anything, but
+# in a pinch (maybe to click a bad element on a webpage) I use coord[1] which
+# lets you specify a point to click, and is bound to Super+p in Tiles[2].
+# [1] https://git.sr.ht/~geb/coord
+# [2] https://git.sr.ht/~geb/tiles
 
 # Click
 index:click left
-
-# Scroll
-# (I only use these as a last resort, like on a webpage where "page", "reel", "up" and "down" don't work)
-explicate:scrollup
-implicate:scrolldown
 
 # Center the cursor in the active window
 # (Requires the xdotool command and is X11 specific)
 center:set DISPLAY /usr/libexec/numen/phrases/displaying\
 eval xdotool mousemove $(xdotool getactivewindow getwindowgeometry | awk '{sub(/[,x]/, " ")}; NR==2 {x=$2;y=$3}; NR==3 {print x+($2)/2, y+($3)/2}')
+
+# Scroll
+# (I very occasionally use these if "page"/"reel" and "up"/"down" don't work.)
+explicate:wheel 5
+implicate:wheel -5

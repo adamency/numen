@@ -1,22 +1,27 @@
 space:press space
 okay:press Return
 tab:press Tab
-@rapidoff scape:unstick press Escape
+scape:stick off\
+	press Escape
 
 # Enable a modifier for the next press
 # (The Super modifier is also known as the "Windows key")
 shift:mod shift
 troll:mod ctrl
 hype:mod alt
-@rapidoff suck:mod super unstick
+suck:mod super\
+	stick off
 # Clear modifiers
-@rapidoff forget:mod clear capsoff unstick
+forget:mod clear\
+	caps off\
+	stick off
 
 # Turn on Caps Lock (turn it off by saying "forget")
 suck shout:mod clear capson
 
 # Start holding down each pressed key (stop it by saying "forget")
-@rapidon suck stick:stick
+suck stick:stick off\
+	stick on
 
 hack:press BackSpace
 scrap:press BackSpace BackSpace
@@ -42,8 +47,10 @@ home:press Home
 end:press End
 
 # Paste the clipboard (depending on the program)
-@rapidoff pastry:unstick press XF86Paste
+pastry:stick off\
+	press XF86Paste
 
+# Repeat the previous press etc.
 more:repeat 1
 double:repeat 2
 handful:repeat 4
@@ -67,3 +74,6 @@ function nine:press F9
 function one zero:press F10
 function one one:press F11
 function one two:press F12
+
+# This saves your changes in vi-style programs
+safeguard:press Escape colon w Return

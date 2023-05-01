@@ -2,7 +2,7 @@
 if [ $# != 0 ]; then
 	cat << 'END' >&2
 numenc is a command to run numen actions programmatically.
-It writes its stdin to $NUMEN_PIPE else /tmp/numen_pipe,
+It writes its stdin to $NUMEN_PIPE else /tmp/numen-pipe,
 and will exit immediately if the pipe is not being read.
 
 Example:
@@ -17,7 +17,7 @@ fifo_being_read(){
 	[ -p "$1" ] && /bin/echo 1<>"$1" >"$1"
 }
 
-p="${NUMEN_PIPE:-/tmp/numen_pipe}"
+p="${NUMEN_PIPE:-/tmp/numen-pipe}"
 
 if [ -p "$p" ] && ! [ -w "$p" ]; then
 	echo "numenc: the pipe does not grant write permission: $p" >&2

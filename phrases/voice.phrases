@@ -1,56 +1,58 @@
 # Cancel sentence
 # For example, "four down no five down" would just do "five down".
-@cancel no
+@cancel no:
 
 # Transcribe a sentence
 # For example, "scribe please type this".
-@transcribe scribe:set fmt echo normal\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe scribe:set numen_fmt echo normal\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 
 # Transcribe a sentence formatted...
+
 # With the first letter uppercase
-@transcribe transcribe:set fmt echo sentence\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe transcribe:set numen_fmt echo sentence\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # With Each First Letter Uppercase
-@transcribe title scribe:set fmt echo title\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
-# UPPERCASE
-@transcribe shout scribe:set fmt echo upper\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe title scribe:set numen_fmt echo title\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
+# ALL UPPERCASE
+@transcribe shout scribe:set numen_fmt echo upper\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # with_underscrores_inbetween
-@transcribe snake scribe:set fmt echo snake\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe snake scribe:set numen_fmt echo snake\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # UPPERCASE_WITH_UNDERSCRORES_INBETWEEN
-@transcribe trench scribe:set fmt echo uppersnake\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe trench scribe:set numen_fmt echo uppersnake\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # with-dashes-inbetween
-@transcribe dash scribe:set fmt echo dash\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe dash scribe:set numen_fmt echo dash\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # with.dots.inbetween
-@transcribe dot scribe:set fmt echo dot\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe dot scribe:set numen_fmt echo dot\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # with/slashes/inbetween
-@transcribe path scribe:set fmt echo path\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe path scribe:set numen_fmt echo path\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # allsmashedtogether
-@transcribe smash scribe:set fmt echo smash\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe smash scribe:set numen_fmt echo smash\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # camelCase
-@transcribe cam scribe:set fmt echo camel\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe cam scribe:set numen_fmt echo camel\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 # UpperCamelCase
-@transcribe camel scribe:set fmt echo uppercamel\
-localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+@transcribe camel scribe:set numen_fmt echo uppercamel\
+	pen /etc/numen/scripts/tweak; /etc/numen/scripts/transcripts | head -n 1
 
 # Erase the transcription
-nevermind:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
+nevermind:eval /etc/numen/scripts/transcripts | sed 's/./ BackSpace/g; s/^/press/; q'
 
 # Go to the start of the transcription
-initial:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
+initial:eval /etc/numen/scripts/transcripts | sed 's/./ Left/g; s/^/press/; q'
 
-# Menu of transcription results
-# (Requires the dmenu command or $NUMEN_DMENU or $DMENU)
-transcripts:eval /usr/libexec/numen/phrases/transcripts "$fmt" &
-# Menu to change transcription result
-# (Requires the dmenu command or $NUMEN_DMENU or $DMENU)
-change:eval /usr/libexec/numen/phrases/transcripts "$fmt" change &
+# Menus to type or choose another transcription result
+# They use the dmenu command (only works in X11) or the command specified
+# by $NUMEN_DMENU or $DMENU (you could use wmenu if you're on Wayland).
+transcripts:run /etc/numen/scripts/menu | numenc &\
+	run sleep 0.1
+change:run /etc/numen/scripts/menu change | numenc &\
+	run sleep 0.1
