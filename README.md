@@ -97,6 +97,6 @@ You're also welcome to join our Matrix chat at
 
 ## License
 
-GPLv3 only, see [LICENSE](./LICENSE).
+AGPLv3 only, see [LICENSE](./LICENSE).
 
 Copyright (c) 2022-2023 John Gebbie
