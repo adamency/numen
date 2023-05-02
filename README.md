@@ -1,7 +1,7 @@
 # Numen
 
-Numen is voice control for computing without a keyboard or mouse,
-and works system-wide on your Linux machine.
+Numen is voice control for computing without a keyboard. It works system-wide
+on Linux and the speech recognition runs locally.
 
 There's a short demonstration on:
 [https://numenvoice.org](https://numenvoice.org)
@@ -47,7 +47,7 @@ Once you've got a microphone, you can run it with:
     numen
 
 There shouldn't be any output but you should be able to type *hey* by saying
-"hoof each yank". You can also try transcribing a sentence after saying
+"hoof each yank".  You can also try transcribing a sentence after saying
 "scribe", and terminate it by pressing Ctrl+c (a.k.a "troy cap").
 
 If nothing happened, check it's using the right audio device with:
