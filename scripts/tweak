@@ -27,9 +27,11 @@ printf %s\\n "$(awk '
 		rep("oh poop", "output")
 		rep("freeze", "phrase")
 		rep("freezes", "phrases")
+		rep("read direct", "redirect")
+		sub(/^turn$/, "return"); sub(/^turn /, "return ")
 		rep("heidi", "tidy")
 		rep("warren", "warn")
-		if (!/down|up|left/) rep("right", "write")
+		if (NF > 1 && !/down|up|left/) rep("right", "write")
 
 		# unknown words
 		rep("the limit her", "delimiter")
