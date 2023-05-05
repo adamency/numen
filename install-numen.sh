@@ -37,10 +37,12 @@ cp numenc "$bin" || exit
 # Install the scripts used in the default phrases
 rm -rf "$NUMEN_SCRIPTS_DIR" && mkdir -p "$NUMEN_SCRIPTS_DIR" || exit
 cp scripts/* "$NUMEN_SCRIPTS_DIR" || exit
+sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$NUMEN_SCRIPTS_DIR"/* || exit
 
 # Install the default phrases
 rm -rf "$NUMEN_DEFAULT_PHRASES_DIR" && mkdir -p "$NUMEN_DEFAULT_PHRASES_DIR" || exit
 cp -r phrases/* "$NUMEN_DEFAULT_PHRASES_DIR" || exit
+sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$NUMEN_DEFAULT_PHRASES_DIR"/* || exit
 
 # Install the manpage
 mkdir -p "$NUMEN_MANPAGE_DIR" && scdoc < doc/numen.1.scd > "$NUMEN_MANPAGE_DIR/numen.1" || exit
