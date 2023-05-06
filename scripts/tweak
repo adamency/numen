@@ -15,6 +15,7 @@ printf %s\\n "$(awk '
 		rep("bite", "byte")
 		rep("bites", "bytes")
 		rep("cash", "cache")
+		rep("flute", "float")
 		rep("mt", "empty")
 		rep("colonel", "kernel")
 		rep("mean", "main")
