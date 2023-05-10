@@ -63,6 +63,8 @@ type Handler interface {
 
 	Caps(b bool)
 	Click(button int)
+	Keydown(chords string)
+	Keyup(chords string)
 	Load(files []string)
 	Mod(mod string)
 	MouseMove(x, y float64)
@@ -135,6 +137,10 @@ func handle(handler *Handler, action string) {
 			} else {
 				warn("unknown handler: " + line)
 			}
+		} else if s, ok := cutWord(line, "keydown"); ok {
+			h.Keydown(h.Chords(s))
+		} else if s, ok := cutWord(line, "keyup"); ok {
+			h.Keyup(h.Chords(s))
 		} else if s, ok := cutWord(line, "load"); ok {
 			h.Load(strings.Fields(s))
 		} else if s, ok := cutWord(line, "mod"); ok {
@@ -351,6 +357,13 @@ func (uh *UinputHandler) Click(button int) {
 	uh.write(fmt.Sprintln("click", button))
 }
 
+func (uh *UinputHandler) Keydown(chords string) {
+	uh.write("keydown " + chords)
+}
+func (uh *UinputHandler) Keyup(chords string) {
+	uh.write("keyup " + chords)
+}
+
 func (uh *UinputHandler) Load(files []string) {
 	uh.load(files)
 }
@@ -564,6 +577,13 @@ func (xh *X11Handler) Caps(b bool) {
 
 func (xh *X11Handler) Click(button int) {
 	xh.run("click", fmt.Sprint(button))
+}
+
+func (xh *X11Handler) Keydown(chords string) {
+	xh.keydown(chords)
+}
+func (xh *X11Handler) Keyup(chords string) {
+	xh.keyup(chords)
 }
 
 func (xh *X11Handler) Load(files []string) {
