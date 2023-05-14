@@ -75,8 +75,11 @@ func (r *Recognizer) SetGrm(phrases []string) {
 	if err != nil {
 		panic(err.Error())
 	}
+	audio := r.Audio
+	r.Purge()
 	r.VoskRecognizer.SetGrm(string(j))
 	r.phraseMap = phrasesplit.Parse(phrases)
+	r.Audio = audio
 }
 func (r *Recognizer) SetKeyphrases(b bool) {
 	r.keyphrases = b

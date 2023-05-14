@@ -469,7 +469,6 @@ func main() {
 	{
 		load := func(files []string) {
 			actions = parseFiles(files, opts.Handler, model)
-			cmdRec.Purge()
 			cmdRec.SetGrm(getPhrases(actions))
 		}
 		if opts.Handler == "gadget" {
