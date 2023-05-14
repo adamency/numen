@@ -240,6 +240,7 @@ func (r *Recognizer) Results() []Result {
 }
 
 func (r *Recognizer) FinalResults() []Result {
+	r.finalized = true
 	return r.parseResults(r.VoskRecognizer.FinalResult())
 }
 
