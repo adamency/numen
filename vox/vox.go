@@ -100,13 +100,17 @@ func (r *Recognizer) SetWords(b bool) {
 }
 
 func (r *Recognizer) index(time float64) int {
-	if time == 0.0 {
-		return 0
-	}
 	rate := float64(r.sampleRate * r.byteDepth)
 	i := time * rate - float64(r.bytesRead - len(r.Audio))
-	// Round to byteDepth multiple
+	// round to byteDepth multiple
 	i = math.Round(i / float64(r.byteDepth)) * float64(r.byteDepth)
+
+	if i < 0 {
+		return 0
+	}
+	if int(i) > len(r.Audio) {
+		return len(r.Audio)
+	}
 	return int(i)
 }
 
