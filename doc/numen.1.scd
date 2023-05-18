@@ -92,7 +92,7 @@ a warning.
 
 	*switch: press ctrl+w w*
 
-	The key names are the XKB keys names which you can find with *dotool
+	The key names are the XKB key names which you can find with *dotool
 	\--list-x-keys*.  The modifiers are *super*, *ctrl*, *alt* and *shift*.
 
 *type* _TEXT_
