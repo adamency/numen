@@ -315,11 +315,12 @@ func (uh *UinputHandler) Chords(chords string) string {
 	}
 	s := ""
 	for _, f := range strings.Fields(chords) {
-		f = strings.ReplaceAll(f, "+", "+x:")
-		f = strings.ReplaceAll(f, "x:x:", "x:")
-		if !strings.Contains(f, "x:") {
+		if i := strings.LastIndex(f, "+"); i >= 0 {
+			f = f[:i+1] + "x:" + f[i+1:]
+		} else {
 			f = "x:" + f
 		}
+		f = strings.Replace(f, "x:x:", "x:", 1)
 		s += mods + f + " "
 	}
 	return s
