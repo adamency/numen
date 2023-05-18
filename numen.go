@@ -363,7 +363,7 @@ func main() {
 		if err != nil {
 			fatal(err)
 		}
-		if len(o.Args()) > 1 {
+		if len(o.Args()) > 0 {
 			opts.Files = o.Args()
 		} else {
 			p, err := os.UserConfigDir()
