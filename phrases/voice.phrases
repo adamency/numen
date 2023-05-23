@@ -59,3 +59,7 @@ transcripts:run /etc/numen/scripts/menu | numenc &\
 	run sleep 0.1
 change:run /etc/numen/scripts/menu change | numenc &\
 	run sleep 0.1
+
+
+# Ignore this, vosk-model-small-en-us-0.15 can output huh after a long silence.
+huh:
