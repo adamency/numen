@@ -18,7 +18,7 @@ cleanse:mod clear\
 
 # Enable Caps Lock until the end of the sentence or you say "cleanse"
 shout:caps on
-<complete>:eval if grep -qvx shout "$NUMEN_STATE_DIR/phrase"; then echo caps off; fi
+<complete>:caps off
 
 # Start holding down each pressed key, and stop by saying "cleanse"
 squeeze:run notify-send STICKING &\
