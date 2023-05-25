@@ -47,7 +47,6 @@ func fatal(a ...any) {
 	fmt.Fprintln(os.Stderr, "numen:", fmt.Sprint(a...))
 	os.Exit(1)
 }
-
 func warn(a ...any) {
 	fmt.Fprintln(os.Stderr, "numen: WARNING:", fmt.Sprint(a...))
 }
@@ -66,6 +65,15 @@ func pipeBeingRead(path string) bool {
 		return ok
 	case <-time.After(time.Millisecond):
 		return false
+	}
+}
+
+func writeLine(f *os.File, s string) {
+	if f != nil {
+		_, err := io.WriteString(f, s + "\n")
+		if err != nil {
+			warn(err)
+		}
 	}
 }
 
@@ -89,7 +97,6 @@ func init() {
 	}
 	os.Setenv("NUMEN_STATE_DIR", p)
 }
-
 func writeStateFile(name string, data []byte) {
 	err := os.WriteFile(os.Getenv("NUMEN_STATE_DIR") + "/" + name, data, 0600)
 	if err != nil {
@@ -102,15 +109,22 @@ type Action struct {
 	Text string
 }
 
-func knownTag(tag string) bool {
-	for _, t := range []string{"cancel", "gadget", "uinput", "transcribe", "x11"} {
-		if t == tag {
-			return true
-		}
+func knownSpecialPhrase(phrase string) bool {
+	switch phrase {
+	case "<complete>": return true
+	case "<blow-begin>", "<blow-end>": return true
+	case "<hiss-begin>", "<hiss-end>": return true
+	case "<shush-begin>", "<shush-end>": return true
 	}
 	return false
 }
-
+func knownTag(tag string) bool {
+	switch tag {
+	case "cancel", "gadget", "uinput", "transcribe", "x11":
+		return true
+	}
+	return false
+}
 func skipPhrase(tags []string, handler string) bool {
 	constrained := false
 	for _, t := range tags {
@@ -163,14 +177,14 @@ func parseFiles(paths []string, handler string, model *vosk.VoskModel) map[strin
 					} else {
 						warn(f.Name() + ": ignoring unknown tag: " + field)
 					}
-				} else if field == "<complete>" {
+				} else if knownSpecialPhrase(field) {
 					if phrase != "" {
-						fatal(f.Name() + ": <complete> can't be mixed with words: " + speech)
+						fatal(f.Name() + ": special phrases can't be mixed with words: " + speech)
 					}
 					phrase += field
 				} else {
-					if phrase == "<complete>" {
-						fatal(f.Name() + ": <complete> can't be mixed with words: " + speech)
+					if phrase != "" && phrase[0] == '<' {
+						fatal(f.Name() + ": special phrases can't be mixed with words: " + speech)
 					}
 					if model.FindWord(field) == -1 {
 						warn(f.Name() + ": ignoring phrase with unknown word: " + speech)
@@ -205,6 +219,20 @@ func getPhrases(actions map[string]Action) []string {
 		}
 	}
 	return phrases
+}
+
+func haveNoises(actions map[string]Action) (bool, bool, bool) {
+	var blow, hiss, shush bool
+	for p := range actions {
+		if strings.HasPrefix(p, "<blow-") {
+			blow = true
+		} else if strings.HasPrefix(p, "<hiss-") {
+			hiss = true
+		} else if strings.HasPrefix(p, "<shush-") {
+			shush = true
+		}
+	}
+	return blow, hiss, shush
 }
 
 func handleTranscribe(h *Handler, results []vox.Result, action Action) {
@@ -251,22 +279,12 @@ func do(handler *Handler, sentence []vox.PhraseResult, actions map[string]Action
 				transcribing = phrase
 			} else {
 				handleTranscribe(handler, transRec.FinalResults(), act)
-				if phraseLog != nil {
-					_, err := io.WriteString(phraseLog, phrase + "\n")
-					if err != nil {
-						warn(err)
-					}
-				}
+				writeLine(phraseLog, phrase)
 			}
 			break
 		}
 		handle(handler, act.Text)
-		if phraseLog != nil {
-			_, err := io.WriteString(phraseLog, phrase + "\n")
-			if err != nil {
-				warn(err)
-			}
-		}
+		writeLine(phraseLog, phrase)
 		writeStateFile("phrase", []byte(phrase))
 	}
 	return transcribing
@@ -446,6 +464,8 @@ func main() {
 
 	var mic string
 	var audio io.Reader
+	var noiseRec *NoiseRecognizer
+	var noiseBuffer *bytes.Buffer
 	if opts.Audio == "" {
 		mic = getMic(opts.Mic)
 		if opts.Verbose {
@@ -464,12 +484,24 @@ func main() {
 		defer f.Close()
 		audio = f
 	}
+	if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
+		noiseBuffer = new(bytes.Buffer)
+		noiseRec = NewNoiseRecognizer(noiseBuffer, blow, hiss, shush)
+	}
 
 	var handler *Handler
 	{
 		load := func(files []string) {
 			actions = parseFiles(files, opts.Handler, model)
 			cmdRec.SetGrm(getPhrases(actions))
+
+			if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
+				noiseBuffer = bytes.NewBuffer([]byte(wavHeader))
+				noiseRec = NewNoiseRecognizer(noiseBuffer, blow, hiss, shush)
+			} else {
+				noiseBuffer = nil
+				noiseRec = nil
+			}
 		}
 		if opts.Handler == "gadget" {
 			h := Handler(NewGadgetHandler(load))
@@ -563,9 +595,33 @@ func main() {
 		}
 
 		if transcribing == "" {
-			finalized, err := cmdRec.Accept(chunk)
-			if err != nil {
-				panic(err)
+			var finalized bool
+
+			if noiseRec != nil {
+				noiseBuffer.Write(chunk)
+				noiseRec.Proceed(len(chunk) / 2)
+				if noiseRec.Noise != noiseRec.PrevNoise {
+					if s := noiseEndString(noiseRec.PrevNoise); s != "" {
+						handle(handler, actions[s].Text)
+						writeLine(opts.PhraseLog, s)
+					}
+					if s := noiseBeginString(noiseRec.Noise); s != "" {
+						handle(handler, actions[s].Text)
+						writeLine(opts.PhraseLog, s)
+						finalized = true
+					}
+				}
+				if !finalized && noiseRec.Noise != NoiseNone {
+					continue
+				}
+			}
+
+			if !finalized {
+				var err error
+				finalized, err = cmdRec.Accept(chunk)
+				if err != nil {
+					panic(err)
+				}
 			}
 			if finalized || ((*handler).Sticky() && cmdRec.Results()[0].Text != "") {
 				var result vox.Result
@@ -599,16 +655,9 @@ func main() {
 			}
 			if finalized {
 				handleTranscribe(handler, transRec.FinalResults(), actions[transcribing])
-				if opts.PhraseLog != nil {
-					_, err := io.WriteString(opts.PhraseLog, transcribing + "\n")
-					if err != nil {
-						warn(err)
-					}
-				}
+				writeLine(opts.PhraseLog, transcribing)
 				transcribing = ""
-				if a, ok := actions["<complete>"]; ok {
-					handle(handler, a.Text)
-				}
+				handle(handler, actions["<complete>"].Text)
 			}
 		}
 	}

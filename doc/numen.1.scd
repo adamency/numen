@@ -204,10 +204,23 @@ For example, to turn off Caps Lock at the end of each sentence:
 
 	*<complete>: caps off*
 
+In addition to speech, *numen* can recognize a few particular noises nearly
+instantaneously. They are too trigger-happy for most uses, but good for
+playing games with a handful of carefully chosen words. Each noise has a
+special phrase for the beginning and end of its detection. They are:
+
+- *<blow-begin>* and *<blow-end>* - Blowing into the microphone.
+- *<hiss-begin>* and *<hiss-end>* - SSSS!
+- *<shush-begin>* and *<shush-end>* - SHHH!
+
+The environment variable *NUMEN_NOISE_THRESHOLD* adjusts the required energy
+for the noises (especially blowing).
+
 # ENVIRONMENT VARIABLES
 
 *numen* can be tweaked by some environment variables:
 
+- *NUMEN_NOISE_THRESHOLD* as noted above.
 - *NUMEN_KEY_DELAY*, *NUMEN_KEY_HOLD*, *NUMEN_TYPE_DELAY* and *NUMEN_TYPE_HOLD*
   are like their corresponding actions but at startup.
 - *NUMEN_SHELL* sets the shell used for shell commands, instead of */bin/sh*.
