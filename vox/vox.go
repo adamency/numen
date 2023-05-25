@@ -76,7 +76,7 @@ func (r *Recognizer) SetGrm(phrases []string) {
 		panic(err.Error())
 	}
 	audio := r.Audio
-	r.Purge()
+	r.Reset()
 	r.VoskRecognizer.SetGrm(string(j))
 	r.phraseMap = phrasesplit.Parse(phrases)
 	r.Audio = audio
@@ -225,11 +225,15 @@ func (r *Recognizer) parseResults(json string) []Result {
 }
 
 func (r *Recognizer) Accept(audio []byte) (bool, error) {
-	r.bytesRead += len(audio)
 	if r.finalized {
 		r.Audio = nil
 		r.finalized = false
 	}
+	if r.Audio == nil {
+		// Prepending silence seems to help, especially when no required pause.
+		audio = append(make([]byte, 4096), audio...)
+	}
+	r.bytesRead += len(audio)
 	r.Audio = append(r.Audio, audio...)
 	code := r.VoskRecognizer.AcceptWaveform(audio)
 	if code == -1 {
@@ -251,12 +255,7 @@ func (r *Recognizer) FinalResults() []Result {
 	return r.parseResults(r.VoskRecognizer.FinalResult())
 }
 
-func (r *Recognizer) Purge() {
-	silence := make([]byte, 4096)
-	_, err := r.Accept(silence)
-	if err != nil {
-		panic(err.Error())
-	}
+func (r *Recognizer) Reset() {
 	r.VoskRecognizer.Reset()
 	r.Audio = nil
 }
