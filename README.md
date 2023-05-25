@@ -87,9 +87,10 @@ You're also welcome to join our Matrix chat at
 
 ## See Also
 
-* [Tiles](https://git.sr.ht/~geb/tiles) - A minimal desktop environment
-  suitable for voice control.
-* [Hiccup](https://git.sr.ht/~geb/hiccup) - Noise input for playing games.
+* [Noggin](https://git.sr.ht/~geb/noggin) - face tracking I use for
+  playing/developing games.
+* [Tiles](https://git.sr.ht/~geb/tiles) - a minimal desktop environment
+  suited to voice control.
 
 ## Support Me
 
