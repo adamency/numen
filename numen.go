@@ -244,7 +244,8 @@ func handleTranscribe(h *Handler, results []vox.Result, action Action) {
 	handle(h, action.Text)
 }
 
-func do(handler *Handler, sentence []vox.PhraseResult, actions map[string]Action, transRec *vox.Recognizer, audio []byte, phraseLog *os.File) string {
+func do(cmdRec, transRec *vox.Recognizer, handler *Handler, sentence []vox.PhraseResult, actions map[string]Action, audio []byte, phraseLog *os.File) string {
+
 	cancel := 0
 	CANCEL:
 	for i := range sentence {
@@ -260,7 +261,6 @@ func do(handler *Handler, sentence []vox.PhraseResult, actions map[string]Action
 	}
 	sentence = sentence[cancel:]
 
-	var transcribing string
 	for i := range sentence {
 		phrase := sentence[i].Text
 		act, _ := actions[phrase]
@@ -276,18 +276,25 @@ func do(handler *Handler, sentence []vox.PhraseResult, actions map[string]Action
 				panic(err)
 			}
 			if i == len(sentence)-1 {
-				transcribing = phrase
-			} else {
-				handleTranscribe(handler, transRec.FinalResults(), act)
-				writeLine(phraseLog, phrase)
+				return phrase
 			}
-			break
+			handleTranscribe(handler, transRec.FinalResults(), act)
+			writeLine(phraseLog, phrase)
+			return ""
 		}
 		handle(handler, act.Text)
 		writeLine(phraseLog, phrase)
 		writeStateFile("phrase", []byte(phrase))
 	}
-	return transcribing
+
+	handle(handler, actions["<complete>"].Text)
+	// Carrying over helps especially when there is no required pause.
+	trailing := cmdRec.Audio[sentence[len(sentence)-1].End:]
+	_, err := cmdRec.Accept(trailing)
+	if err != nil {
+		panic(err)
+	}
+	return ""
 }
 
 func main() {
@@ -626,6 +633,9 @@ func main() {
 			if finalized || ((*handler).Sticky() && cmdRec.Results()[0].Text != "") {
 				var result vox.Result
 				for _, result = range cmdRec.FinalResults() {
+					if result.Text == "" {
+						continue
+					}
 					sentence := result.Phrases
 					ok := result.Valid
 					if !ok {
@@ -640,12 +650,9 @@ func main() {
 						}
 					}
 					if ok {
-						transcribing = do(handler, sentence, actions, transRec, cmdRec.Audio, opts.PhraseLog)
+						transcribing = do(cmdRec, transRec, handler, sentence, actions, cmdRec.Audio, opts.PhraseLog)
 						break
 					}
-				}
-				if a, ok := actions["<complete>"]; ok && result.Text != "" {
-					handle(handler, a.Text)
 				}
 			}
 		} else {
@@ -656,8 +663,8 @@ func main() {
 			if finalized {
 				handleTranscribe(handler, transRec.FinalResults(), actions[transcribing])
 				writeLine(opts.PhraseLog, transcribing)
-				transcribing = ""
 				handle(handler, actions["<complete>"].Text)
+				transcribing = ""
 			}
 		}
 	}
