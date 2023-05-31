@@ -287,7 +287,6 @@ func do(cmdRec, transRec *vox.Recognizer, handler *Handler, sentence []vox.Phras
 		writeStateFile("phrase", []byte(phrase))
 	}
 
-	handle(handler, actions["<complete>"].Text)
 	// Carrying over helps especially when there is no required pause.
 	trailing := cmdRec.Audio[sentence[len(sentence)-1].End:]
 	_, err := cmdRec.Accept(trailing)
@@ -651,6 +650,9 @@ func main() {
 					}
 					if ok {
 						transcribing = do(cmdRec, transRec, handler, sentence, actions, cmdRec.Audio, opts.PhraseLog)
+						if transcribing == "" {
+							handle(handler, actions["<complete>"].Text)
+						}
 						break
 					}
 				}
