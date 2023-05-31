@@ -77,6 +77,8 @@ frank one one:press F11
 frank one two:press F12
 
 # This saves your changes in vi-style programs
-save:press Escape colon w Return
+save:caps off\
+	press Escape colon w Return
 # This cycles round splits in Vim
-switch:press Escape ctrl+w w
+switch:caps off\
+	press Escape ctrl+w w
