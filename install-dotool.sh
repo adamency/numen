@@ -12,7 +12,7 @@ ok=1
 
 rm -rf tmp && mkdir -p tmp && cd tmp || exit
 
-wget --no-verbose --show-progress -O dotool.tar.gz "$distfile" || exit
+wget --no-verbose -O dotool.tar.gz "$distfile" || exit
 if [ "$(sha256sum dotool.tar.gz | cut -d' ' -f1)" != "$checksum" ]; then
 	echo 'dotool.tar.gz did not match checksum'
 	exit 1
