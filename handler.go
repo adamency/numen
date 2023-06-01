@@ -122,6 +122,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "eval"); ok {
 			handle(handler, shell(s))
 		} else if s, ok := cutWord(line, "handler"); ok {
+			s = strings.TrimSpace(s)
 			if s == "gadget" {
 				h.Close()
 				*handler = NewGadgetHandler(h.Load)
@@ -144,7 +145,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "load"); ok {
 			h.Load(strings.Fields(s))
 		} else if s, ok := cutWord(line, "mod"); ok {
-			h.Mod(s)
+			h.Mod(strings.TrimSpace(s))
 		} else if s, ok := cutWord(line, "mousemove"); ok {
 			s = strings.TrimSpace(s)
 			var x, y float64
@@ -174,8 +175,7 @@ func handle(handler *Handler, action string) {
 			h.Mod("clear")
 			h.Cache("press " + chords)
 		} else if s, ok := cutWord(line, "repeat"); ok {
-			s = strings.TrimSpace(s)
-			times, err := strconv.Atoi(s)
+			times, err := strconv.Atoi(strings.TrimSpace(s))
 			if err == nil {
 				for i := 0; i < times; i++ {
 					handle(handler, h.Cached())
@@ -196,6 +196,7 @@ func handle(handler *Handler, action string) {
 			env, cmd, _ := strings.Cut(s, " ")
 			os.Setenv(env, shell(cmd))
 		} else if s, ok := cutWord(line, "stick"); ok {
+			s = strings.TrimSpace(s)
 			if s == "on" {
 				h.Stick(true)
 			} else if s == "off" {
