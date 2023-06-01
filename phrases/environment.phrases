@@ -3,27 +3,27 @@
 # preconfigured desktop environment: https://git.sr.ht/~geb/tiles
 
 # Navigate to the window in the given direction
-west:stick off\
+west: stick off \
 	press super+Left
-east:stick off\
+east: stick off \
 	press super+Right
-north:stick off\
+north: stick off \
 	press super+Up
-south:stick off\
+south: stick off \
 	press super+Down
 
 # Cycle round the windows
-cycle:stick off\
+cycle: stick off \
 	press super+c
-recycle:stick off\
+recycle: stick off \
 	press super+C
 
 # Close window
-exterminate:stick off\
+exterminate: stick off \
 	press super+q
 
 # Toggle fullscreen
-screen:stick off\
+screen: stick off \
 	press super+f
 
 
@@ -31,6 +31,6 @@ screen:stick off\
 # These two are just for --gadget mode.
 
 # Switch to controlling the gadget
-@gadget shock gadget:handler uinput
+@gadget shock gadget: handler uinput
 # Switch to controlling the host machine
-@gadget shock host:handler gadget
+@gadget shock host: handler gadget

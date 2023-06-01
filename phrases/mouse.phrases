@@ -5,13 +5,13 @@
 # [2] https://git.sr.ht/~geb/tiles
 
 # Click
-mouse:click left
+mouse: click left
 
 # Center the cursor
-center:mouseto 0 0\
+center: mouseto 0 0 \
 	mouseto 0.5 0.5
 
 # Scroll
 # (I very occasionally use these if "page"/"reel" and "up"/"down" don't work.)
-scroll up:wheel 5
-scroll down:wheel -5
+scroll up: wheel 5
+scroll down: wheel -5
