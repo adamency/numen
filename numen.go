@@ -140,12 +140,12 @@ func skipPhrase(tags []string, handler string) bool {
 	return constrained
 }
 
-func parseFiles(paths []string, handler string, model *vosk.VoskModel) map[string]Action {
+func parseFiles(paths []string, handler string, model *vosk.VoskModel) (map[string]Action, error) {
 	actions := make(map[string]Action)
 	for _, p := range paths {
 		f, err := os.Open(p)
 		if err != nil {
-			fatal(err)
+			return actions, err
 		}
 		defer f.Close()
 		sc := bufio.NewScanner(f)
@@ -155,12 +155,14 @@ func parseFiles(paths []string, handler string, model *vosk.VoskModel) map[strin
 			}
 			speech, action, found := strings.Cut(sc.Text(), ":")
 			if !found {
-				fatal(f.Name() + ": invalid phrase definition: " + sc.Text())
+				warn(f.Name() + ": invalid phrase definition: " + sc.Text())
+				continue
 			}
 			if len(action) > 0 {
 				for []rune(action)[len([]rune(action))-1] == '\\' {
 					if !sc.Scan() {
-						fatal(f.Name() + ": unexpected end of file")
+						warn(f.Name() + ": unexpected end of file")
+						break
 					}
 					action = action[:len(action)-1] + "\n" + sc.Text()
 				}
@@ -170,24 +172,30 @@ func parseFiles(paths []string, handler string, model *vosk.VoskModel) map[strin
 			for _, field := range strings.Fields(speech) {
 				if field[0] == '@' {
 					if phrase != "" {
-						fatal(f.Name() + ": all tags should be before the phrase: " + speech)
+						warn(f.Name() + ": all tags should be before the phrase: " + speech)
+						phrase = ""
+						break
 					}
 					if knownTag(field[1:]) {
 						tags = append(tags, field[1:])
 					} else {
-						warn(f.Name() + ": ignoring unknown tag: " + field)
+						warn(f.Name() + ": unknown tag: " + field)
 					}
 				} else if knownSpecialPhrase(field) {
 					if phrase != "" {
-						fatal(f.Name() + ": special phrases can't be mixed with words: " + speech)
+						warn(f.Name() + ": special phrases can't be mixed with words: " + speech)
+						phrase = ""
+						break
 					}
 					phrase += field
 				} else {
 					if phrase != "" && phrase[0] == '<' {
-						fatal(f.Name() + ": special phrases can't be mixed with words: " + speech)
+						warn(f.Name() + ": special phrases can't be mixed with words: " + speech)
+						phrase = ""
+						break
 					}
 					if model.FindWord(field) == -1 {
-						warn(f.Name() + ": ignoring phrase with unknown word: " + speech)
+						warn(f.Name() + ": phrase with unknown word: " + speech)
 						phrase = ""
 						break
 					}
@@ -208,7 +216,7 @@ func parseFiles(paths []string, handler string, model *vosk.VoskModel) map[strin
 			panic(sc.Err())
 		}
 	}
-	return actions
+	return actions, nil
 }
 
 func getPhrases(actions map[string]Action) []string {
@@ -445,7 +453,10 @@ func main() {
 	}
 	defer model.Free()
 
-	actions := parseFiles(opts.Files, opts.Handler, model)
+	actions, err := parseFiles(opts.Files, opts.Handler, model)
+	if err != nil {
+		fatal(err)
+	}
 
 	var cmdRec, transRec *vox.Recognizer
 	{
@@ -498,7 +509,12 @@ func main() {
 	var handler *Handler
 	{
 		load := func(files []string) {
-			actions = parseFiles(files, opts.Handler, model)
+			acts, err := parseFiles(files, opts.Handler, model)
+			if err != nil {
+				warn(err)
+				return
+			}
+			actions = acts
 			cmdRec.SetGrm(getPhrases(actions))
 
 			if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
