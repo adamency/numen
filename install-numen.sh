@@ -2,10 +2,10 @@
 # install-numen.sh [DESTDIR] [BINDIR]
 : "${NUMEN_VERSION=$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.6)}"
 : "${NUMEN_DEFAULT_MODEL_PACKAGE=vosk-model-small-en-us}"
-: "${NUMEN_DEFAULT_MODEL_PATHS=$1/usr/local/share/vosk-models/small-en-us $1/usr/share/vosk-models/small-en-us}"
-: "${NUMEN_DEFAULT_PHRASES_DIR=$1/etc/numen/phrases}"
-: "${NUMEN_MANPAGE_DIR=$1/usr/share/man/man1}"
-: "${NUMEN_SCRIPTS_DIR=$1/etc/numen/scripts}"
+: "${NUMEN_DEFAULT_MODEL_PATHS=/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us}"
+: "${NUMEN_DEFAULT_PHRASES_DIR=/etc/numen/phrases}"
+: "${NUMEN_MANPAGE_DIR=/usr/share/man/man1}"
+: "${NUMEN_SCRIPTS_DIR=/etc/numen/scripts}"
 
 if ! [ "$NUMEN_SKIP_CHECKS" ]; then
 	ok=1
@@ -35,16 +35,16 @@ fi
 cp numenc "$bin" || exit
 
 # Install the scripts used in the default phrases
-rm -rf "$NUMEN_SCRIPTS_DIR" && mkdir -p "$NUMEN_SCRIPTS_DIR" || exit
-cp scripts/* "$NUMEN_SCRIPTS_DIR" || exit
-sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$NUMEN_SCRIPTS_DIR"/* || exit
+rm -rf "$1/$NUMEN_SCRIPTS_DIR" && mkdir -p "$1/$NUMEN_SCRIPTS_DIR" || exit
+cp scripts/* "$1/$NUMEN_SCRIPTS_DIR" || exit
+sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$1/$NUMEN_SCRIPTS_DIR"/* || exit
 
 # Install the default phrases
-rm -rf "$NUMEN_DEFAULT_PHRASES_DIR" && mkdir -p "$NUMEN_DEFAULT_PHRASES_DIR" || exit
-cp -r phrases/* "$NUMEN_DEFAULT_PHRASES_DIR" || exit
-sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$NUMEN_DEFAULT_PHRASES_DIR"/* || exit
+rm -rf "$1/$NUMEN_DEFAULT_PHRASES_DIR" && mkdir -p "$1/$NUMEN_DEFAULT_PHRASES_DIR" || exit
+cp -r phrases/* "$1/$NUMEN_DEFAULT_PHRASES_DIR" || exit
+sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" "$1/$NUMEN_DEFAULT_PHRASES_DIR"/* || exit
 
 # Install the manpage
-mkdir -p "$NUMEN_MANPAGE_DIR" && scdoc < doc/numen.1.scd > "$NUMEN_MANPAGE_DIR/numen.1" || exit
+mkdir -p "$1/$NUMEN_MANPAGE_DIR" && scdoc < doc/numen.1.scd > "$1/$NUMEN_MANPAGE_DIR/numen.1" || exit
 
 echo 'Installed successfully.'
