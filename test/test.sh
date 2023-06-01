@@ -1,5 +1,5 @@
 #!/bin/sh
-if test "$(NUMEN_PIPE=/tmp/numen_pipe_test numen --audio=test.wav test.phrases 2>&1)" = \
+if test "$(NUMEN_PIPE=/tmp/numen-test-pipe numen --audio=test.wav test.phrases)" = \
 'n
 u
 m
