@@ -439,7 +439,7 @@ func main() {
 			}
 		}
 		if m == "" {
-			fatal("you need to install the" + DefaultModelPackage + " package or set $NUMEN_MODEL")
+			fatal("you need to install the " + DefaultModelPackage + " package or set $NUMEN_MODEL")
 		}
 		if opts.Verbose {
 			fmt.Fprintln(os.Stderr, "Model: " + m)
