@@ -23,16 +23,23 @@ if ! [ "$NUMEN_SKIP_CHECKS" ]; then
 	fi
 fi
 
-bin="$1/${2:-usr/local/bin}"
-mkdir -p "$bin" || exit
 if ! [ "$NUMEN_SKIP_BINARY" ]; then
 	go build -ldflags "-X 'main.Version=$NUMEN_VERSION'
 		-X 'main.DefaultModelPackage=$NUMEN_DEFAULT_MODEL_PACKAGE'
 		-X 'main.DefaultModelPaths=$NUMEN_DEFAULT_MODEL_PATHS'
 		-X 'main.DefaultPhrasesDir=$NUMEN_DEFAULT_PHRASES_DIR'" || exit
-	cp numen "$bin" || exit
+	echo 'Built successfully.'
 fi
-cp numenc "$bin" || exit
+
+if [ "$NUMEN_SKIP_INSTALL" ]; then
+	exit
+fi
+
+mkdir -p "$1/${2:-usr/local/bin}" || exit
+if ! [ "$NUMEN_SKIP_BINARY" ]; then
+	cp numen "$1/${2:-usr/local/bin}" || exit
+fi
+cp numenc "$1/${2:-usr/local/bin}" || exit
 
 # Install the scripts used in the default phrases
 rm -rf "$1/$NUMEN_SCRIPTS_DIR" && mkdir -p "$1/$NUMEN_SCRIPTS_DIR" || exit
