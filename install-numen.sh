@@ -1,6 +1,6 @@
 #!/bin/sh
 # install-numen.sh [DESTDIR] [BINDIR]
-: "${NUMEN_VERSION=$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.6)}"
+: "${NUMEN_VERSION=$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.7)}"
 : "${NUMEN_DEFAULT_MODEL_PACKAGE=vosk-model-small-en-us}"
 : "${NUMEN_DEFAULT_MODEL_PATHS=/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us}"
 : "${NUMEN_DEFAULT_PHRASES_DIR=/etc/numen/phrases}"

@@ -2,6 +2,11 @@
 
 Notable changes to the default phrases will be documented in this file.
 
+## [0.7](https://git.sr.ht/~geb/numen/refs/0.7)
+
+There were many changes to the phrases to be more terse and accurate, and
+in preparation for becoming stable.
+
 ## [0.6](https://git.sr.ht/~geb/numen/refs/0.6)
 
 ### Added
