@@ -1,14 +1,14 @@
 # Numen
 
-Numen is voice control for computing without a keyboard. It works system-wide
-on Linux and the speech recognition runs locally.
+Numen is voice control for handsfree computing, letting you type efficiently
+by saying syllables and literal words. It works system-wide on Linux, and
+the speech recognition runs locally.
 
-There's a short demonstration on:
-[https://numenvoice.org](https://numenvoice.org)
+There's a short demonstration on: [numenvoice.org](https://numenvoice.org)
 
 ## Install From Source
 
-`go` is required. (It's sometimes packaged as `golang`)
+`go` (a.k.a `golang`) is required.
 
 The [speech recognition library](https://alphacephei.com/vosk) and an English
 model (about 40MB) can be installed with:
@@ -24,7 +24,7 @@ Finally, `numen` itself can be installed with:
 
     sudo ./install-numen.sh
 
-## Permission
+## Permission and Keyboard Layouts
 
 `dotool` requires permission to `/dev/uinput` to create the virtual input
 devices, and a udev rule grants this to users in group input.
@@ -40,15 +40,18 @@ and if need be, you can run:
 
 and re-login and trigger the udev rule or just reboot.
 
+If it types something other than *hello*, see about keyboard layouts in the
+[manpage](doc/numen.1.scd).
+
 ## Getting Started
 
 Once you've got a microphone, you can run it with:
 
     numen
 
-There shouldn't be any output but you should be able to type *hey* by saying
-"hoof each yank".  You can also try transcribing a sentence after saying
-"scribe", and terminate it by pressing Ctrl+c (a.k.a "troy cap").
+There shouldn't be any output, but you can try typing *hey* by saying "hoof
+each yank", and try transcribing a sentence after saying "scribe". Terminate
+it by pressing Ctrl+c (a.k.a "troy cap").
 
 If nothing happened, check it's using the right audio device with:
 
@@ -57,42 +60,35 @@ If nothing happened, check it's using the right audio device with:
 
 and specify a `--mic` from `--list-mics` if not.
 
-Now you can have a go in your text editor, the default phrases are in the
-`/etc/numen/phrases` directory.
+Now you're ready to have a go in your text editor! The default phrases are
+in the `/etc/numen/phrases` directory.
 
 ## Going Further
 
-I use numen for all my computing and stick to keyboard-based programs like
-[Neovim](https://neovim.io) and [qutebrowser](https://qutebrowser.org), my text
-editor and browser.  I also use a minimal desktop environment I wrote called
-[Tiles](https://git.sr.ht/~geb/tiles) that doesn't require a pointer device.
+I just use Numen and the default phrases for all my computing,
+with keyboard-based programs like [Neovim](https://neovim.io) and
+[qutebrowser](https://qutebrowser.org). I also use a minimal desktop
+environment I made, called [Tiles](https://git.sr.ht/~geb/tiles), that
+doesn't require a pointer device for window management, file picking, etc.
 
-## Keyboard Layouts
+The [manpage](doc/numen.1.scd) covers configuring Numen.
 
-dotool will type gobbledygook if your environment has assigned it a different
-keyboard layout than it's simulating keycodes for.  You can match them up by
-setting the environment variables `DOTOOL_XKB_LAYOUT` and `DOTOOL_XKB_VARIANT`.
+## Mailing List and Matrix Chat
 
-For example, if you use the French `fr` layout:
-
-    DOTOOL_XKB_LAYOUT=fr numen
-
-## Contact and Matrix Chat
-
-You can send questions, thoughts or patches by composing an email to
+You can send questions or patches by composing an email to
 [~geb/public-inbox@lists.sr.ht](https://lists.sr.ht/~geb/public-inbox).
 
-You're also welcome to join our Matrix chat at
+You're also welcome to join the Matrix chat at
 [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
 
 ## See Also
 
-* [Noggin](https://git.sr.ht/~geb/noggin) - face tracking I use for
-  playing/developing games.
 * [Tiles](https://git.sr.ht/~geb/tiles) - a minimal desktop environment
   suited to voice control.
+* [Noggin](https://git.sr.ht/~geb/noggin) - face tracking I use for
+  playing/developing games.
 
-## Support Me
+## Support My Work 👀
 
 [Thank you!](https://liberapay.com/geb)
 
