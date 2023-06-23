@@ -6,6 +6,16 @@ the speech recognition runs locally.
 
 There's a short demonstration on: [numenvoice.org](https://numenvoice.org)
 
+## Install From Packages
+
+Packages of Numen are available on:
+
+- [Alpine](https://pkgs.alpinelinux.org/packages?name=numen)
+- [Arch (AUR)](https://aur.archlinux.org/packages?SeB=N&K=numen)
+- [Nix (anpandey's flake)](https://github.com/anpandey/numen-nix)
+
+and potentially other platforms.
+
 ## Install From Source
 
 `go` (a.k.a `golang`) is required.
