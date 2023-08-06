@@ -1,7 +1,7 @@
 # Numen
 
 Numen is voice control for handsfree computing, letting you type efficiently
-by saying syllables and literal words. It works system-wide on Linux, and
+by saying syllables and literal words. It works system-wide on Linux and
 the speech recognition runs locally.
 
 There's a short demonstration on: [numenvoice.org](https://numenvoice.org)
@@ -18,10 +18,10 @@ and potentially other platforms.
 
 ## Install From Source
 
-`go` (a.k.a `golang`) is required.
+`go` (aka `golang`) and `scdoc` are required.
 
-The [speech recognition library](https://alphacephei.com/vosk) and an English
-model (about 40MB) can be installed with:
+A binary of the [speech recognition library](https://alphacephei.com/vosk)
+and an English model (about 40MB) can be installed with:
 
     sudo ./install-vosk.sh && sudo ./install-model.sh
 
@@ -30,7 +30,7 @@ can be installed with:
 
     sudo ./install-dotool.sh
 
-Finally, `numen` itself can be installed with:
+Finally, Numen itself can be installed with:
 
     sudo ./install-numen.sh
 
@@ -39,11 +39,11 @@ Finally, `numen` itself can be installed with:
 `dotool` requires permission to `/dev/uinput` to create the virtual input
 devices, and a udev rule grants this to users in group input.
 
-You could try:
+You can try:
 
     echo type hello | dotool
 
-and if need be, you can run:
+and if need be, you could add your user to group input with:
 
     sudo groupadd -f input
     sudo usermod -a -G input $USER
@@ -61,7 +61,7 @@ Once you've got a microphone, you can run it with:
 
 There shouldn't be any output, but you can try typing *hey* by saying "hoof
 each yank", and try transcribing a sentence after saying "scribe". Terminate
-it by pressing Ctrl+c (a.k.a "troy cap").
+it by pressing Ctrl+c (aka "troy cap").
 
 If nothing happened, check it's using the right audio device with:
 
@@ -75,8 +75,8 @@ in the `/etc/numen/phrases` directory.
 
 ## Going Further
 
-I just use Numen and the default phrases for all my computing,
-with keyboard-based programs like [Neovim](https://neovim.io) and
+I use Numen and the default phrases for all my computing, with
+keyboard-based programs like [Neovim](https://neovim.io) and
 [qutebrowser](https://qutebrowser.org). I also use a minimal desktop
 environment I made, called [Tiles](https://git.sr.ht/~geb/tiles), that
 doesn't require a pointer device for window management, file picking, etc.

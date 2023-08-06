@@ -12,7 +12,7 @@ if ! [ "$NUMEN_SKIP_CHECKS" ]; then
 	! command -v arecord >/dev/null && echo 'you need the alsa-utils package' && unset ok
 	! command -v dotool >/dev/null && echo 'you need dotool' && unset ok
 	! command -v gcc >/dev/null && echo 'you need gcc' && unset ok
-	! command -v go >/dev/null && echo 'you need go (sometimes packaged as golang)' && unset ok
+	! command -v go >/dev/null && echo 'you need go (aka golang)' && unset ok
 	! command -v scdoc >/dev/null && echo 'you need scdoc' && unset ok
 	[ "$ok" ] || exit
 

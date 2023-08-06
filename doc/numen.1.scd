@@ -6,8 +6,7 @@ numen(1)
 
 # SYNOPSIS
 
-*numen* [*--gadget*|*--uinput*|*--x11*] [*--mic=*_NAME_] [_FILE_...]++
-*numen* *--help*
+*numen* [*--gadget*|*--uinput*|*--x11*] [*--mic=*_NAME_] [_FILE_...]
 
 # DESCRIPTION
 
@@ -253,7 +252,7 @@ Run *numen* with the default phrases:
 
 There shouldn't be any output but you should be able to type *hey* by saying
 "hoof each yank". You can also try transcribing a sentence after saying
-"scribe", and terminate it by pressing Ctrl+c (a.k.a "troy cap").
+"scribe", and terminate it by pressing Ctrl+c (aka "troy cap").
 
 Check the microphone:
 
