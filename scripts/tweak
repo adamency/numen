@@ -4,7 +4,10 @@
 
 printf %s\\n "$(awk '
 	function rep(a, b) {
-		gsub("^"a"$", b); gsub("^"a" ", b" "); gsub(" "a"$", " "b)
+		gsub("^"a"$", b)
+		gsub("^"a" ", b" ")
+		gsub(" "a" ", " "b" ")
+		gsub(" "a"$", " "b)
 	}
 	{ line = $0 }
 	NF < 5 {
