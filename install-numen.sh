@@ -24,7 +24,7 @@ if ! [ "$NUMEN_SKIP_CHECKS" ]; then
 fi
 
 if ! [ "$NUMEN_SKIP_BINARY" ]; then
-	go build -ldflags "-X 'main.Version=$NUMEN_VERSION'
+	go build -buildvcs=false -ldflags "-X 'main.Version=$NUMEN_VERSION'
 		-X 'main.DefaultModelPackage=$NUMEN_DEFAULT_MODEL_PACKAGE'
 		-X 'main.DefaultModelPaths=$NUMEN_DEFAULT_MODEL_PATHS'
 		-X 'main.DefaultPhrasesDir=$NUMEN_DEFAULT_PHRASES_DIR'" || exit
