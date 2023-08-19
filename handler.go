@@ -61,6 +61,8 @@ type Handler interface {
 	Chords(chords string) string
 	Sticky() bool
 
+	Buttondown(button int)
+	Buttonup(button int)
 	Caps(b bool)
 	Click(button int)
 	Keydown(chords string)
@@ -94,11 +96,34 @@ func cutWord(s, word string) (string, bool) {
 	return "", false
 }
 
+func button(b string) int {
+	switch strings.TrimSpace(b) {
+	case "left", "1": return 1
+	case "middle", "2": return 2
+	case "right", "3": return 3
+	}
+	return 0
+}
+
 func handle(handler *Handler, action string) {
 	h := *handler
 	for _, line := range strings.Split(action, "\n") {
 		line = strings.TrimLeft(line, " \t")
-		if s, ok := cutWord(line, "caps"); ok {
+		if s, ok := cutWord(line, "buttondown"); ok {
+			if b := button(s); b > 0 {
+				h.Buttondown(b)
+			} else {
+				warn("unknown button: " + line)
+			}
+			h.Cache(line)
+		} else if s, ok := cutWord(line, "buttonup"); ok {
+			if b := button(s); b > 0 {
+				h.Buttonup(b)
+			} else {
+				warn("unknown button: " + line)
+			}
+			h.Cache(line)
+		} else if s, ok := cutWord(line, "caps"); ok {
 			s = strings.TrimSpace(s)
 			if s == "on" {
 				h.Caps(true)
@@ -108,13 +133,8 @@ func handle(handler *Handler, action string) {
 				warn("invalid argument: " + line)
 			}
 		} else if s, ok := cutWord(line, "click"); ok {
-			s = strings.TrimSpace(s)
-			if s == "left" || s == "1" {
-				h.Click(1)
-			} else if s == "middle" || s == "2" {
-				h.Click(2)
-			} else if s == "right" || s == "3" {
-				h.Click(3)
+			if b := button(s); b > 0 {
+				h.Click(b)
 			} else {
 				warn("unknown button: " + line)
 			}
@@ -337,6 +357,13 @@ func (uh *UinputHandler) Sticky() bool {
 	return uh.stuck != ""
 }
 
+func (uh *UinputHandler) Buttondown(button int) {
+	uh.write(fmt.Sprintln("buttondown", button))
+}
+func (uh *UinputHandler) Buttonup(button int) {
+	uh.write(fmt.Sprintln("buttonup", button))
+}
+
 func (uh *UinputHandler) Caps(b bool) {
 	caps := uh.caps
 	time.Sleep(time.Duration(50)*time.Millisecond)
@@ -555,6 +582,13 @@ func (xh *X11Handler) Chords(chords string) string {
 
 func (xh *X11Handler) Sticky() bool {
 	return xh.stuck != ""
+}
+
+func (xh *X11Handler) Buttondown(button int) {
+	xh.run("mousedown", fmt.Sprint(button))
+}
+func (xh *X11Handler) Buttonup(button int) {
+	xh.run("mouseup", fmt.Sprint(button))
 }
 
 func (xh *X11Handler) Caps(b bool) {
