@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"git.sr.ht/~geb/numen/vox/phrasesplit"
+	vosk "github.com/alphacep/vosk-api/go"
 	"github.com/m7shapan/njson"
 	"math"
 	"strings"
-	vosk "github.com/alphacep/vosk-api/go"
 )
 
 func init() {
@@ -19,30 +19,30 @@ func NewModel(filepath string) (*vosk.VoskModel, error) {
 }
 
 type PhraseResult struct {
-	Text string
+	Text       string
 	Confidence float64
 	Start, End int
 }
 
 type Result struct {
-	Text string
-	Phrases []PhraseResult
-	Confidence float64
+	Text           string
+	Phrases        []PhraseResult
+	Confidence     float64
 	Valid, Partial bool
 }
 
 type Recognizer struct {
-	VoskRecognizer *vosk.VoskRecognizer
-	phraseMap map[string][]string
+	VoskRecognizer        *vosk.VoskRecognizer
+	phraseMap             map[string][]string
 	sampleRate, byteDepth int
-	bytesRead int
-	Audio []byte
-	finalized bool
-	keyphrases bool
+	bytesRead             int
+	Audio                 []byte
+	finalized             bool
+	keyphrases            bool
 }
 
 func NewRecognizer(model *vosk.VoskModel, sampleRate, bitDepth int, phrases []string) (*Recognizer, error) {
-	if bitDepth % 8 != 0 {
+	if bitDepth%8 != 0 {
 		panic("bitDepth must be a multiple of eight")
 	}
 	var r *vosk.VoskRecognizer
@@ -63,7 +63,7 @@ func NewRecognizer(model *vosk.VoskModel, sampleRate, bitDepth int, phrases []st
 		}
 	}
 	p := phrasesplit.Parse(phrases)
-	return &Recognizer{r, p, sampleRate, bitDepth/8, 0, nil, false, false}, nil
+	return &Recognizer{r, p, sampleRate, bitDepth / 8, 0, nil, false, false}, nil
 }
 
 func (r *Recognizer) Free() {
@@ -104,9 +104,9 @@ func (r *Recognizer) SetWords(b bool) {
 
 func (r *Recognizer) index(time float64) int {
 	rate := float64(r.sampleRate * r.byteDepth)
-	i := time * rate - float64(r.bytesRead - len(r.Audio))
+	i := time*rate - float64(r.bytesRead-len(r.Audio))
 	// round to byteDepth multiple
-	i = math.Round(i / float64(r.byteDepth)) * float64(r.byteDepth)
+	i = math.Round(i/float64(r.byteDepth)) * float64(r.byteDepth)
 
 	if i < 0 {
 		return 0
@@ -119,29 +119,29 @@ func (r *Recognizer) index(time float64) int {
 
 func (r *Recognizer) parseVoskResults(json string) []Result {
 	type ResultJson struct {
-		Text string `njson:"text"`
-		Words []string `njson:"result.#.word"`
-		Confs []float64 `njson:"result.#.conf"`
-		Starts []float64 `njson:"result.#.start"`
-		Ends []float64 `njson:"result.#.end"`
-		Confidence float64 `njson:"confidence"`  // only with alternatives
+		Text       string    `njson:"text"`
+		Words      []string  `njson:"result.#.word"`
+		Confs      []float64 `njson:"result.#.conf"`
+		Starts     []float64 `njson:"result.#.start"`
+		Ends       []float64 `njson:"result.#.end"`
+		Confidence float64   `njson:"confidence"` // only with alternatives
 	}
 	var s struct {
 		Alternatives []ResultJson `njson:"alternatives"`
 
 		// copy paste of ResultJson
-		Text string `njson:"text"`
-		Words []string `njson:"result.#.word"`
-		Confs []float64 `njson:"result.#.conf"`
-		Starts []float64 `njson:"result.#.start"`
-		Ends []float64 `njson:"result.#.end"`
-		Confidence float64 `njson:"confidence"`  // only with alternatives
+		Text       string    `njson:"text"`
+		Words      []string  `njson:"result.#.word"`
+		Confs      []float64 `njson:"result.#.conf"`
+		Starts     []float64 `njson:"result.#.start"`
+		Ends       []float64 `njson:"result.#.end"`
+		Confidence float64   `njson:"confidence"` // only with alternatives
 
-		ParText string `njson:"partial"`
-		ParWords []string `njson:"partial_result.#.word"`
-		ParConfs []float64 `njson:"partial_result.#.conf"`
+		ParText   string    `njson:"partial"`
+		ParWords  []string  `njson:"partial_result.#.word"`
+		ParConfs  []float64 `njson:"partial_result.#.conf"`
 		ParStarts []float64 `njson:"partial_result.#.start"`
-		ParEnds []float64 `njson:"partial_result.#.end"`
+		ParEnds   []float64 `njson:"partial_result.#.end"`
 	}
 	err := njson.Unmarshal([]byte(json), &s)
 	if err != nil {
@@ -157,7 +157,7 @@ func (r *Recognizer) parseVoskResults(json string) []Result {
 			for p := range results[a].Phrases {
 				results[a].Phrases[p] = PhraseResult{
 					s.Alternatives[a].Words[p],
-					-1,  // conf isn't given
+					-1, // conf isn't given
 					r.index(s.Alternatives[a].Starts[p]),
 					r.index(s.Alternatives[a].Ends[p]),
 				}
@@ -167,7 +167,7 @@ func (r *Recognizer) parseVoskResults(json string) []Result {
 	}
 	if len(s.Text) > 0 {
 		result := Result{Text: s.Text}
-		result.Confidence = -1  // confidence isn't given
+		result.Confidence = -1 // confidence isn't given
 		result.Phrases = make([]PhraseResult, len(s.Words))
 		for p := range result.Phrases {
 			result.Phrases[p] = PhraseResult{
@@ -178,7 +178,7 @@ func (r *Recognizer) parseVoskResults(json string) []Result {
 		return []Result{result}
 	}
 	result := Result{Text: s.ParText, Partial: true}
-	result.Confidence = -1  // confidence isn't given
+	result.Confidence = -1 // confidence isn't given
 	result.Phrases = make([]PhraseResult, len(s.ParWords))
 	for p := range result.Phrases {
 		result.Phrases[p] = PhraseResult{
@@ -208,7 +208,7 @@ func (r *Recognizer) parseResults(json string) []Result {
 			if n > 1 {
 				text := results[ri].Phrases[pi].Text
 				conf := results[ri].Phrases[pi].Confidence
-				for _, p := range results[ri].Phrases[pi+1:pi+n] {
+				for _, p := range results[ri].Phrases[pi+1 : pi+n] {
 					text += " " + p.Text
 					conf += p.Confidence
 				}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"git.sr.ht/~geb/numen/vox"
 	"git.sr.ht/~geb/opt"
+	vosk "github.com/alphacep/vosk-api/go"
 	"io"
 	"os"
 	"os/exec"
@@ -15,14 +16,13 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	vosk "github.com/alphacep/vosk-api/go"
 )
 
 var (
-	Version string
+	Version             string
 	DefaultModelPackage = "vosk-model-small-en-us"
-	DefaultModelPaths = "/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us"
-	DefaultPhrasesDir = "/etc/numen/phrases"
+	DefaultModelPaths   = "/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us"
+	DefaultPhrasesDir   = "/etc/numen/phrases"
 )
 
 func usage() {
@@ -70,7 +70,7 @@ func pipeBeingRead(path string) bool {
 
 func writeLine(f *os.File, s string) {
 	if f != nil {
-		_, err := io.WriteString(f, s + "\n")
+		_, err := io.WriteString(f, s+"\n")
 		if err != nil {
 			warn(err)
 		}
@@ -91,14 +91,14 @@ func init() {
 		}
 	}
 	p += "/numen"
-	err := os.MkdirAll(p, 0700)
+	err := os.MkdirAll(p, 0o700)
 	if err != nil {
 		fatal(err)
 	}
 	os.Setenv("NUMEN_STATE_DIR", p)
 }
 func writeStateFile(name string, data []byte) {
-	err := os.WriteFile(os.Getenv("NUMEN_STATE_DIR") + "/" + name, data, 0600)
+	err := os.WriteFile(os.Getenv("NUMEN_STATE_DIR")+"/"+name, data, 0o600)
 	if err != nil {
 		warn(err)
 	}
@@ -111,10 +111,14 @@ type Action struct {
 
 func knownSpecialPhrase(phrase string) bool {
 	switch phrase {
-	case "<complete>": return true
-	case "<blow-begin>", "<blow-end>": return true
-	case "<hiss-begin>", "<hiss-end>": return true
-	case "<shush-begin>", "<shush-end>": return true
+	case "<complete>":
+		return true
+	case "<blow-begin>", "<blow-end>":
+		return true
+	case "<hiss-begin>", "<hiss-end>":
+		return true
+	case "<shush-begin>", "<shush-end>":
+		return true
 	}
 	return false
 }
@@ -253,9 +257,8 @@ func handleTranscribe(h *Handler, results []vox.Result, action Action) {
 }
 
 func do(cmdRec, transRec *vox.Recognizer, handler *Handler, sentence []vox.PhraseResult, actions map[string]Action, audio []byte, phraseLog *os.File) string {
-
 	cancel := 0
-	CANCEL:
+CANCEL:
 	for i := range sentence {
 		act, _ := actions[sentence[i].Text]
 		for _, tag := range act.Tags {
@@ -275,7 +278,7 @@ func do(cmdRec, transRec *vox.Recognizer, handler *Handler, sentence []vox.Phras
 		transcribe := false
 		for _, tag := range act.Tags {
 			if tag == "transcribe" {
-				 transcribe = true
+				transcribe = true
 			}
 		}
 		if transcribe {
@@ -306,13 +309,13 @@ func do(cmdRec, transRec *vox.Recognizer, handler *Handler, sentence []vox.Phras
 
 func main() {
 	var opts struct {
-		Audio string
-		AudioLog *os.File
-		Files []string
-		Handler string
-		Mic string
+		Audio     string
+		AudioLog  *os.File
+		Files     []string
+		Handler   string
+		Mic       string
 		PhraseLog *os.File
-		Verbose bool
+		Verbose   bool
 	}
 	opts.Handler = "uinput"
 	{
@@ -442,7 +445,7 @@ func main() {
 			fatal("you need to install the " + DefaultModelPackage + " package or set $NUMEN_MODEL")
 		}
 		if opts.Verbose {
-			fmt.Fprintln(os.Stderr, "Model: " + m)
+			fmt.Fprintln(os.Stderr, "Model: "+m)
 		}
 
 		var err error
@@ -486,7 +489,7 @@ func main() {
 	if opts.Audio == "" {
 		mic = getMic(opts.Mic)
 		if opts.Verbose {
-			fmt.Fprintln(os.Stderr, "Microphone: " + mic)
+			fmt.Fprintln(os.Stderr, "Microphone: "+mic)
 		}
 		var err error
 		audio, err = record(mic)
@@ -537,7 +540,7 @@ func main() {
 		} else {
 			panic("unreachable")
 		}
-		defer func(){ (*handler).Close() }()
+		defer func() { (*handler).Close() }()
 	}
 
 	pipe := make(chan func())
@@ -547,7 +550,7 @@ func main() {
 			p = "/tmp/numen-pipe"
 		}
 		if opts.Verbose {
-			fmt.Fprintln(os.Stderr, "Pipe: " + p)
+			fmt.Fprintln(os.Stderr, "Pipe: "+p)
 		}
 
 		if pipeBeingRead(p) {
@@ -557,7 +560,7 @@ func main() {
 		if err := os.Remove(p); err != nil && !errors.Is(err, os.ErrNotExist) {
 			fatal(err)
 		}
-		if err := syscall.Mkfifo(p, 0600); err != nil {
+		if err := syscall.Mkfifo(p, 0o600); err != nil {
 			panic(err)
 		}
 		defer os.Remove(p)
@@ -569,7 +572,7 @@ func main() {
 		go func() {
 			sc := bufio.NewScanner(f)
 			for sc.Scan() {
-				pipe <- func(){ handle(handler, sc.Text()) }
+				pipe <- func() { handle(handler, sc.Text()) }
 			}
 			if sc.Err() != nil {
 				warn(sc.Err())
@@ -584,8 +587,10 @@ func main() {
 	transcribing := ""
 	for {
 		select {
-		case <-terminate: return
-		case f := <- pipe: f()
+		case <-terminate:
+			return
+		case f := <-pipe:
+			f()
 		default:
 		}
 		chunk := make([]byte, 4096)

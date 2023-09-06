@@ -24,7 +24,7 @@ func Split(sentence string, phraseMap map[string][]string) ([]string, bool) {
 	var phrases, beforeBacktrack []string
 	var forks []int
 	i, backtrack := 0, false
-	OUTER:
+OUTER:
 	for ; i < len(words) || backtrack; i++ {
 		skip := 0
 		if backtrack {
@@ -52,7 +52,7 @@ func Split(sentence string, phraseMap map[string][]string) ([]string, bool) {
 					continue OUTER
 				}
 				n := strings.Count(args, " ") + 1
-				if i + n >= len(words) {
+				if i+n >= len(words) {
 					continue
 				}
 				if args == strings.Join(words[i+1:i+n+1], " ") {

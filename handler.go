@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -49,10 +49,10 @@ func delay(ms, env string, def int, line string) int {
 }
 
 var (
-	defaultKeyDelay = delay("2", "NUMEN_KEY_DELAY", 0, "")
-	defaultKeyHold = delay("8", "NUMEN_KEY_HOLD", 0, "")
+	defaultKeyDelay  = delay("2", "NUMEN_KEY_DELAY", 0, "")
+	defaultKeyHold   = delay("8", "NUMEN_KEY_HOLD", 0, "")
 	defaultTypeDelay = delay("2", "NUMEN_TYPE_DELAY", 0, "")
-	defaultTypeHold = delay("8", "NUMEN_TYPE_HOLD", 0, "")
+	defaultTypeHold  = delay("8", "NUMEN_TYPE_HOLD", 0, "")
 )
 
 type Handler interface {
@@ -90,7 +90,7 @@ func cutWord(s, word string) (string, bool) {
 	if s == word {
 		return "", true
 	}
-	if strings.HasPrefix(s, word + " ") || strings.HasPrefix(s, word + "\t") {
+	if strings.HasPrefix(s, word+" ") || strings.HasPrefix(s, word+"\t") {
 		return s[len(word)+1:], true
 	}
 	return "", false
@@ -98,9 +98,12 @@ func cutWord(s, word string) (string, bool) {
 
 func button(b string) int {
 	switch strings.TrimSpace(b) {
-	case "left", "1": return 1
-	case "middle", "2": return 2
-	case "right", "3": return 3
+	case "left", "1":
+		return 1
+	case "middle", "2":
+		return 2
+	case "right", "3":
+		return 3
 	}
 	return 0
 }
@@ -169,7 +172,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "mousemove"); ok {
 			s = strings.TrimSpace(s)
 			var x, y float64
-			_, err := fmt.Sscanf(s + "\n", "%f %f\n", &x, &y)
+			_, err := fmt.Sscanf(s+"\n", "%f %f\n", &x, &y)
 			if err == nil {
 				h.MouseMove(x, y)
 			} else {
@@ -179,7 +182,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "mouseto"); ok {
 			s = strings.TrimSpace(s)
 			var x, y float64
-			_, err := fmt.Sscanf(s + "\n", "%f %f\n", &x, &y)
+			_, err := fmt.Sscanf(s+"\n", "%f %f\n", &x, &y)
 			if err == nil {
 				h.MouseTo(x, y)
 			} else {
@@ -230,7 +233,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "wheel"); ok {
 			s = strings.TrimSpace(s)
 			var n int
-			_, err := fmt.Sscanf(s + "\n", "%d\n", &n)
+			_, err := fmt.Sscanf(s+"\n", "%d\n", &n)
 			if err == nil {
 				h.Wheel(n)
 			} else {
@@ -240,7 +243,7 @@ func handle(handler *Handler, action string) {
 		} else if s, ok := cutWord(line, "hwheel"); ok {
 			s = strings.TrimSpace(s)
 			var n int
-			_, err := fmt.Sscanf(s + "\n", "%d\n", &n)
+			_, err := fmt.Sscanf(s+"\n", "%d\n", &n)
 			if err == nil {
 				h.Hwheel(n)
 			} else {
@@ -285,13 +288,13 @@ func mods(mod string, super, ctrl, alt, shift bool) (bool, bool, bool, bool) {
 }
 
 type UinputHandler struct {
-	dotool *exec.Cmd
-	stdin io.WriteCloser
-	load func(files []string)
+	dotool                  *exec.Cmd
+	stdin                   io.WriteCloser
+	load                    func(files []string)
 	super, ctrl, alt, shift bool
-	caps bool
-	cache string
-	stuck string
+	caps                    bool
+	cache                   string
+	stuck                   string
 }
 
 func NewUinputHandler(load func(files []string)) *UinputHandler {
@@ -313,7 +316,7 @@ func NewUinputHandler(load func(files []string)) *UinputHandler {
 }
 
 func (uh *UinputHandler) write(s string) {
-	_, err := io.WriteString(uh.stdin, s + "\n")
+	_, err := io.WriteString(uh.stdin, s+"\n")
 	if err != nil {
 		fatal(err)
 	}
@@ -366,7 +369,7 @@ func (uh *UinputHandler) Buttonup(button int) {
 
 func (uh *UinputHandler) Caps(b bool) {
 	caps := uh.caps
-	time.Sleep(time.Duration(50)*time.Millisecond)
+	time.Sleep(time.Duration(50) * time.Millisecond)
 	files, _ := filepath.Glob("/sys/class/leds/input*::capslock/brightness")
 	for _, f := range files {
 		data, _ := os.ReadFile(f)
@@ -468,7 +471,6 @@ func (uh *UinputHandler) Close() {
 	}
 }
 
-
 type GadgetHandler struct {
 	*UinputHandler
 }
@@ -502,12 +504,11 @@ func (gh *GadgetHandler) Caps(b bool) {
 	gh.caps = b
 }
 
-
 type X11Handler struct {
-	load func(files []string)
-	super, ctrl, alt, shift bool
-	cache string
-	stuck string
+	load                                   func(files []string)
+	super, ctrl, alt, shift                bool
+	cache                                  string
+	stuck                                  string
 	keyDelay, keyHold, typeDelay, typeHold int
 }
 
@@ -537,18 +538,18 @@ func (xh *X11Handler) run(args ...string) {
 
 func (xh *X11Handler) key(chords string) {
 	d := fmt.Sprint(xh.keyDelay + xh.keyHold)
-	xh.run(strings.Split("key --delay " + d + " -- " +  chords, " ")...)
+	xh.run(strings.Split("key --delay "+d+" -- "+chords, " ")...)
 }
 func (xh *X11Handler) keydown(chords string) {
 	d := fmt.Sprint(xh.keyDelay)
-	xh.run(strings.Split("keydown --delay " + d + " -- " +  chords, " ")...)
+	xh.run(strings.Split("keydown --delay "+d+" -- "+chords, " ")...)
 }
 func (xh *X11Handler) keyup(chords string) {
 	d := fmt.Sprint(xh.keyDelay)
-	xh.run(strings.Split("keyup --delay " + d + " -- " +  chords, " ")...)
+	xh.run(strings.Split("keyup --delay "+d+" -- "+chords, " ")...)
 }
 func (xh *X11Handler) type_(text string) {
-	d := fmt.Sprint((xh.typeDelay + xh.typeHold)*2)
+	d := fmt.Sprint((xh.typeDelay + xh.typeHold) * 2)
 	xh.run("type", "--delay", d, "--", text)
 }
 
