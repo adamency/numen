@@ -86,7 +86,7 @@ The [manpage](doc/numen.1.scd) covers configuring Numen.
 ## Mailing List and Matrix Chat
 
 You can send questions or patches by composing an email to
-[~geb/public-inbox@lists.sr.ht](https://lists.sr.ht/~geb/public-inbox).
+[~geb/numen@lists.sr.ht](https://lists.sr.ht/~geb/numen).
 
 You're also welcome to join the Matrix chat at
 [#numen:matrix.org](https://matrix.to/#/#numen:matrix.org).
