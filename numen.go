@@ -119,6 +119,8 @@ func knownSpecialPhrase(phrase string) bool {
 		return true
 	case "<shush-begin>", "<shush-end>":
 		return true
+	case "<unknown>":
+		return true
 	}
 	return false
 }
@@ -226,7 +228,9 @@ func parseFiles(paths []string, handler string, model *vosk.VoskModel) (map[stri
 func getPhrases(actions map[string]Action) []string {
 	phrases := make([]string, 0, len(actions))
 	for p := range actions {
-		if p[0] != '<' {
+		if p == "<unknown>" {
+			phrases = append(phrases, "[unk]")
+		} else if p[0] != '<' {
 			phrases = append(phrases, p)
 		}
 	}
@@ -641,29 +645,40 @@ func main() {
 			}
 			if finalized || ((*handler).Sticky() && cmdRec.Results()[0].Text != "") {
 				var result vox.Result
+				var valid bool
 				for _, result = range cmdRec.FinalResults() {
 					if result.Text == "" {
 						continue
 					}
 					sentence := result.Phrases
-					ok := result.Valid
-					if !ok {
-						for p := range sentence {
-							a, _ := actions[sentence[p].Text]
-							for _, t := range a.Tags {
-								if t == "transcribe" {
-									ok = true
-									break
-								}
+					valid = result.Valid
+PHRASE:
+					for _, phrase := range sentence {
+						if phrase.Text == "[unk]" {
+							valid = false
+							break
+						}
+						for _, t := range actions[phrase.Text].Tags {
+							if t == "transcribe" {
+								valid = true
+								break PHRASE
 							}
 						}
 					}
-					if ok {
+
+					if valid {
 						transcribing = do(cmdRec, transRec, handler, sentence, actions, cmdRec.Audio, opts.PhraseLog)
 						if transcribing == "" {
 							handle(handler, actions["<complete>"].Text)
 						}
 						break
+					}
+				}
+
+				if !valid {
+					if a, ok := actions["<unknown>"]; ok {
+						writeLine(opts.PhraseLog, "<unknown>")
+						handle(handler, a.Text)
 					}
 				}
 			}

@@ -198,10 +198,13 @@ Tags have phrases act specially.
 
 # SPECIAL PHRASES
 
-The special phrase *<complete>* is performed after each sentence is performed.
+The special phrase *<complete>* is triggered after each sentence is performed.
 For example, to turn off Caps Lock at the end of each sentence:
 
 	*<complete>: caps off*
+
+If the special phrase *<unknown>* is provided, *numen* prefers to abort
+dubious sentences. The phrase is triggered on these occasions.
 
 In addition to speech, *numen* can recognize a few particular noises nearly
 instantaneously. They are too trigger-happy for most uses, but good for
