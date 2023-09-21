@@ -24,7 +24,7 @@ if ! [ "$1" ]; then
 	echo Downloaded successfully.
 else
 	unzip -qo "$f.zip" || exit
-	mkdir -p /usr/local/share/vosk-models || exit
-	mv -T "$f" "/usr/local/share/vosk-models/$name" || exit
+	mkdir -p /usr/share/vosk-models || exit
+	mv -T "$f" "/usr/share/vosk-models/$name" || exit
 	echo Installed successfully.
 fi

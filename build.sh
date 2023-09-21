@@ -6,7 +6,7 @@
 : "${NUMEN_DEFAULT_PHRASES_DIR=/etc/numen/phrases}"
 : "${NUMEN_SCRIPTS_DIR=/etc/numen/scripts}"
 : "${NUMEN_DEFAULT_MODEL_PACKAGE=vosk-model-small-en-us}"
-: "${NUMEN_DEFAULT_MODEL_PATHS=/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us}"
+: "${NUMEN_DEFAULT_MODEL_PATHS=/usr/share/vosk-models/small-en-us}"
 
 if [ "$*" != '' ] && [ "$*" != install ]; then
 	echo bad usage
@@ -39,4 +39,11 @@ else
 	mkdir -p "$NUMEN_DESTDIR/usr/share/man/man1" || exit
 	scdoc < doc/numen.1.scd > "$NUMEN_DESTDIR/usr/share/man/man1/numen.1" || exit
 	echo Installed Successfully.
+
+	if [ -e /usr/local/share/vosk-models/small-en-us ]; then
+		echo '
+NOTE /usr/local/share/vosk-models/small-en-us is deprecated.
+To move it:
+mv -T /usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us'
+	fi
 fi

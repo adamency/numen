@@ -21,7 +21,7 @@ import (
 var (
 	Version             string
 	DefaultModelPackage = "vosk-model-small-en-us"
-	DefaultModelPaths   = "/usr/local/share/vosk-models/small-en-us /usr/share/vosk-models/small-en-us"
+	DefaultModelPaths   = "/usr/share/vosk-models/small-en-us"
 	DefaultPhrasesDir   = "/etc/numen/phrases"
 )
 
