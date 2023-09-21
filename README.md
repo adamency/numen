@@ -23,16 +23,17 @@ and potentially other platforms.
 A binary of the [speech recognition library](https://alphacephei.com/vosk)
 and an English model (about 40MB) can be installed with:
 
-    sudo ./install-vosk.sh && sudo ./install-model.sh
+    ./get-vosk.sh && sudo ./get-vosk.sh install
+    ./get-model.sh && sudo ./get-model.sh install
 
 The [dotool](https://sr.ht/~geb/dotool) command which simulates the input,
 can be installed with:
 
-    sudo ./install-dotool.sh
+    ./get-dotool.sh && sudo ./get-dotool.sh install
 
 Finally, Numen itself can be installed with:
 
-    sudo ./install-numen.sh
+    ./build.sh && sudo ./build.sh install
 
 ## Permission and Keyboard Layouts
 
