@@ -59,6 +59,7 @@ type Handler interface {
 	Cache(action string)
 	Cached() string
 	Chords(chords string) string
+	Rec() *Recognition
 	Sticky() bool
 
 	Buttondown(button int)
@@ -148,15 +149,15 @@ func handle(handler *Handler, action string) {
 			s = strings.TrimSpace(s)
 			if s == "gadget" {
 				h.Close()
-				*handler = NewGadgetHandler(h.Load)
+				*handler = NewGadgetHandler(h.Rec(), h.Load)
 				writeStateFile("handler", []byte(s))
 			} else if s == "uinput" {
 				h.Close()
-				*handler = NewUinputHandler(h.Load)
+				*handler = NewUinputHandler(h.Rec(), h.Load)
 				writeStateFile("handler", []byte(s))
 			} else if s == "x11" {
 				h.Close()
-				*handler = NewX11Handler(h.Load)
+				*handler = NewX11Handler(h.Rec(), h.Load)
 				writeStateFile("handler", []byte(s))
 			} else {
 				warn("unknown handler: " + line)
@@ -227,6 +228,14 @@ func handle(handler *Handler, action string) {
 			} else {
 				warn("invalid argument: " + line)
 			}
+		} else if s, ok := cutWord(line, "tmodel"); ok {
+			i, err := strconv.Atoi(s)
+			rec := h.Rec()
+			if err == nil && i >= 1 && i <= len(rec.TranRecs) {
+				rec.TranRec = rec.TranRecs[i-1]
+			} else {
+				warn("invalid argument: " + line)
+			}
 		} else if s, ok := cutWord(line, "type"); ok {
 			h.Type(s)
 			h.Cache(line)
@@ -290,6 +299,7 @@ func mods(mod string, super, ctrl, alt, shift bool) (bool, bool, bool, bool) {
 type UinputHandler struct {
 	dotool                  *exec.Cmd
 	stdin                   io.WriteCloser
+	rec                     *Recognition
 	load                    func(files []string)
 	super, ctrl, alt, shift bool
 	caps                    bool
@@ -297,7 +307,7 @@ type UinputHandler struct {
 	stuck                   string
 }
 
-func NewUinputHandler(load func(files []string)) *UinputHandler {
+func NewUinputHandler(rec *Recognition, load func(files []string)) *UinputHandler {
 	dotool := exec.Command("dotool")
 	stdin, err := dotool.StdinPipe()
 	if err != nil {
@@ -307,7 +317,7 @@ func NewUinputHandler(load func(files []string)) *UinputHandler {
 	if err := dotool.Start(); err != nil {
 		fatal(err)
 	}
-	uh := &UinputHandler{dotool: dotool, stdin: stdin, load: load}
+	uh := &UinputHandler{dotool: dotool, stdin: stdin, rec: rec, load: load}
 	uh.Keydelay(defaultKeyDelay)
 	uh.Keyhold(defaultKeyHold)
 	uh.Typedelay(defaultTypeDelay)
@@ -354,6 +364,10 @@ func (uh *UinputHandler) Chords(chords string) string {
 		s += mods + f + " "
 	}
 	return s
+}
+
+func (uh *UinputHandler) Rec() *Recognition {
+	return uh.rec
 }
 
 func (uh *UinputHandler) Sticky() bool {
@@ -475,7 +489,7 @@ type GadgetHandler struct {
 	*UinputHandler
 }
 
-func NewGadgetHandler(load func(files []string)) *GadgetHandler {
+func NewGadgetHandler(rec *Recognition, load func(files []string)) *GadgetHandler {
 	if _, err := exec.LookPath("gadget"); err != nil {
 		fatal(`the gadget handler requires the gadget command:
     https://git.sr.ht/~geb/gadget`)
@@ -489,7 +503,7 @@ func NewGadgetHandler(load func(files []string)) *GadgetHandler {
 	if err := gadget.Start(); err != nil {
 		fatal(err)
 	}
-	gh := &GadgetHandler{&UinputHandler{dotool: gadget, stdin: stdin, load: load}}
+	gh := &GadgetHandler{&UinputHandler{dotool: gadget, stdin: stdin, rec: rec, load: load}}
 	gh.Keydelay(defaultKeyDelay)
 	gh.Keyhold(defaultKeyHold)
 	gh.Typedelay(defaultTypeDelay)
@@ -505,6 +519,7 @@ func (gh *GadgetHandler) Caps(b bool) {
 }
 
 type X11Handler struct {
+	rec                                    *Recognition
 	load                                   func(files []string)
 	super, ctrl, alt, shift                bool
 	cache                                  string
@@ -512,8 +527,8 @@ type X11Handler struct {
 	keyDelay, keyHold, typeDelay, typeHold int
 }
 
-func NewX11Handler(load func(files []string)) *X11Handler {
-	xh := &X11Handler{load: load}
+func NewX11Handler(rec *Recognition, load func(files []string)) *X11Handler {
+	xh := &X11Handler{rec: rec, load: load}
 	xh.Keydelay(defaultKeyDelay)
 	xh.Keyhold(defaultKeyHold)
 	xh.Typedelay(defaultTypeDelay)
@@ -583,6 +598,10 @@ func (xh *X11Handler) Chords(chords string) string {
 
 func (xh *X11Handler) Sticky() bool {
 	return xh.stuck != ""
+}
+
+func (xh *X11Handler) Rec() *Recognition {
+	return xh.rec
 }
 
 func (xh *X11Handler) Buttondown(button int) {

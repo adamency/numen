@@ -6,7 +6,7 @@
 : "${NUMEN_DEFAULT_PHRASES_DIR=/etc/numen/phrases}"
 : "${NUMEN_SCRIPTS_DIR=/etc/numen/scripts}"
 : "${NUMEN_DEFAULT_MODEL_PACKAGE=vosk-model-small-en-us}"
-: "${NUMEN_DEFAULT_MODEL_PATHS=/usr/share/vosk-models/small-en-us}"
+: "${NUMEN_DEFAULT_MODEL=/usr/share/vosk-models/small-en-us}"
 
 if [ "$*" != '' ] && [ "$*" != install ]; then
 	echo bad usage
@@ -24,9 +24,13 @@ if ! [ "$NUMEN_SKIP_CHECKS" ]; then
 fi
 
 if ! [ "$1" ]; then
+	if [ "$NUMEN_DEFAULT_MODEL_PATHS" ]; then
+		echo 'NOTE $NUMEN_DEFAULT_MODEL_PATHS is deprecated, favoring $NUMEN_DEFAULT_MODEL.'
+	fi
+
 	go build -ldflags "-X 'main.Version=$NUMEN_VERSION'
 		-X 'main.DefaultModelPackage=$NUMEN_DEFAULT_MODEL_PACKAGE'
-		-X 'main.DefaultModelPaths=$NUMEN_DEFAULT_MODEL_PATHS'
+		-X 'main.DefaultModel=$NUMEN_DEFAULT_MODEL'
 		-X 'main.DefaultPhrasesDir=$NUMEN_DEFAULT_PHRASES_DIR'" || exit
 	echo Built successfully.
 else

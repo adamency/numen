@@ -21,7 +21,7 @@ import (
 var (
 	Version             string
 	DefaultModelPackage = "vosk-model-small-en-us"
-	DefaultModelPaths   = "/usr/share/vosk-models/small-en-us"
+	DefaultModel        = "/usr/share/vosk-models/small-en-us"
 	DefaultPhrasesDir   = "/etc/numen/phrases"
 )
 
@@ -37,6 +37,7 @@ actions when you say their phrases.
 --uinput         Use the uinput handler to perform the actions. (default)
 --list-mics      List audio devices and exit. (same as arecord -L)
 --mic=NAME       Specify the audio device.
+--models=PATHS   Specify the speech recognition models.
 --phraselog=FILE Write phrases to FILE when they are performed.
 --verbose        Show what is being used.
 --version        Print the version and exit.
@@ -307,16 +308,86 @@ CANCEL:
 	return ""
 }
 
-func main() {
-	var opts struct {
-		Audio     string
-		AudioLog  *os.File
-		Files     []string
-		Handler   string
-		Mic       string
-		PhraseLog *os.File
-		Verbose   bool
+type Recognition struct {
+	Models   []*vosk.VoskModel
+	CmdRec   *vox.Recognizer
+	TranRecs []*vox.Recognizer
+	TranRec  *vox.Recognizer
+}
+
+func (r *Recognition) Free() {
+	for i := range r.Models {
+		r.Models[i].Free()
 	}
+	r.CmdRec.Free()
+	for i := range r.TranRecs {
+		r.TranRecs[i].Free()
+	}
+}
+
+func loadModels(paths string) []*vosk.VoskModel {
+	if paths == "" {
+		if _, err := os.Stat(DefaultModel); errors.Is(err, os.ErrNotExist) {
+			fatal("The default model doesn't exist: " + DefaultModel + `
+so specify --models or install the default model package: ` + DefaultModelPackage)
+		}
+		paths = DefaultModel
+	}
+
+	fields := strings.Fields(paths)
+	if opts.Verbose {
+		fmt.Fprintf(os.Stderr, "Models: %q\n", fields)
+	}
+	models := make([]*vosk.VoskModel, len(fields))
+	for i := range fields {
+		var err error
+		models[i], err = vox.NewModel(fields[i])
+		if err != nil {
+			fatal(err)
+		}
+	}
+	return models
+}
+
+func makeRecognizers(models []*vosk.VoskModel, phrases []string) (cmdRec *vox.Recognizer, tranRecs []*vox.Recognizer) {
+	sampleRate, bitDepth := 16000, 16
+	var err error
+	cmdRec, err = vox.NewRecognizer(models[0], sampleRate, bitDepth, phrases)
+	if err != nil {
+		panic(err)
+	}
+	cmdRec.SetWords(true)
+	cmdRec.SetKeyphrases(true)
+	cmdRec.SetMaxAlternatives(3)
+
+	tranRecs = make([]*vox.Recognizer, len(models))
+	for i := range tranRecs {
+		var err error
+		tranRecs[i], err = vox.NewRecognizer(models[i], sampleRate, bitDepth, nil)
+		if err != nil {
+			panic(err)
+		}
+		tranRecs[i].SetMaxAlternatives(10)
+	}
+	return
+}
+
+var opts struct {
+	Audio     string
+	AudioLog  *os.File
+	Files     []string
+	Handler   string
+	Mic       string
+	Models    string
+	PhraseLog *os.File
+	Verbose   bool
+}
+
+func main() {
+	if os.Getenv("NUMEN_MODEL") != "" {
+		warn("$NUMEN_MODEL has been deprecated in favor of --models")
+	}
+
 	opts.Handler = "uinput"
 	{
 		o := opt.NewOptionSet()
@@ -361,6 +432,11 @@ func main() {
 
 		o.Func("mic", func(s string) error {
 			opts.Mic = s
+			return nil
+		})
+
+		o.Func("models", func(s string) error {
+			opts.Models = s
 			return nil
 		})
 
@@ -430,57 +506,18 @@ func main() {
 	}
 	writeStateFile("handler", []byte(opts.Handler))
 
-	var model *vosk.VoskModel
-	{
-		m := os.Getenv("NUMEN_MODEL")
-		if m == "" {
-			for _, p := range strings.Fields(DefaultModelPaths) {
-				if _, err := os.Stat(p); !errors.Is(err, os.ErrNotExist) {
-					m = p
-					break
-				}
-			}
-		}
-		if m == "" {
-			fatal("you need to install the " + DefaultModelPackage + " package or set $NUMEN_MODEL")
-		}
-		if opts.Verbose {
-			fmt.Fprintln(os.Stderr, "Model: "+m)
-		}
+	rec := &Recognition{}
+	defer rec.Free()
 
-		var err error
-		model, err = vox.NewModel(m)
-		if err != nil {
-			fatal(err)
-		}
-	}
-	defer model.Free()
+	rec.Models = loadModels(opts.Models)
 
-	actions, err := parseFiles(opts.Files, opts.Handler, model)
+	actions, err := parseFiles(opts.Files, opts.Handler, rec.Models[0])
 	if err != nil {
 		fatal(err)
 	}
 
-	var cmdRec, transRec *vox.Recognizer
-	{
-		sampleRate, bitDepth := 16000, 16
-		var err error
-		cmdRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, getPhrases(actions))
-		if err != nil {
-			panic(err)
-		}
-		cmdRec.SetWords(true)
-		cmdRec.SetKeyphrases(true)
-		cmdRec.SetMaxAlternatives(3)
-
-		transRec, err = vox.NewRecognizer(model, sampleRate, bitDepth, nil)
-		if err != nil {
-			panic(err)
-		}
-		transRec.SetMaxAlternatives(10)
-	}
-	defer cmdRec.Free()
-	defer transRec.Free()
+	rec.CmdRec, rec.TranRecs = makeRecognizers(rec.Models, getPhrases(actions))
+	rec.TranRec = rec.TranRecs[0]
 
 	var mic string
 	var audio io.Reader
@@ -512,13 +549,13 @@ func main() {
 	var handler *Handler
 	{
 		load := func(files []string) {
-			acts, err := parseFiles(files, opts.Handler, model)
+			acts, err := parseFiles(files, opts.Handler, rec.Models[0])
 			if err != nil {
 				warn(err)
 				return
 			}
 			actions = acts
-			cmdRec.SetGrm(getPhrases(actions))
+			rec.CmdRec.SetGrm(getPhrases(actions))
 
 			if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
 				noiseBuffer = bytes.NewBuffer([]byte(wavHeader))
@@ -529,13 +566,13 @@ func main() {
 			}
 		}
 		if opts.Handler == "gadget" {
-			h := Handler(NewGadgetHandler(load))
+			h := Handler(NewGadgetHandler(rec, load))
 			handler = &h
 		} else if opts.Handler == "uinput" {
-			h := Handler(NewUinputHandler(load))
+			h := Handler(NewUinputHandler(rec, load))
 			handler = &h
 		} else if opts.Handler == "x11" {
-			h := Handler(NewX11Handler(load))
+			h := Handler(NewX11Handler(rec, load))
 			handler = &h
 		} else {
 			panic("unreachable")
@@ -645,14 +682,14 @@ func main() {
 
 			if !finalized {
 				var err error
-				finalized, err = cmdRec.Accept(chunk)
+				finalized, err = rec.CmdRec.Accept(chunk)
 				if err != nil {
 					panic(err)
 				}
 			}
-			if finalized || ((*handler).Sticky() && cmdRec.Results()[0].Text != "") {
+			if finalized || ((*handler).Sticky() && rec.CmdRec.Results()[0].Text != "") {
 				var result vox.Result
-				for _, result = range cmdRec.FinalResults() {
+				for _, result = range rec.CmdRec.FinalResults() {
 					if result.Text == "" {
 						continue
 					}
@@ -670,7 +707,7 @@ func main() {
 						}
 					}
 					if ok {
-						transcribing = do(cmdRec, transRec, handler, sentence, actions, cmdRec.Audio, opts.PhraseLog)
+						transcribing = do(rec.CmdRec, rec.TranRec, handler, sentence, actions, rec.CmdRec.Audio, opts.PhraseLog)
 						if transcribing == "" {
 							handle(handler, actions["<complete>"].Text)
 						}
@@ -679,12 +716,12 @@ func main() {
 				}
 			}
 		} else {
-			finalized, err := transRec.Accept(chunk)
+			finalized, err := rec.TranRec.Accept(chunk)
 			if err != nil {
 				panic(err)
 			}
 			if finalized {
-				handleTranscribe(handler, transRec.FinalResults(), actions[transcribing])
+				handleTranscribe(handler, rec.TranRec.FinalResults(), actions[transcribing])
 				writeLine(opts.PhraseLog, transcribing)
 				handle(handler, actions["<complete>"].Text)
 				transcribing = ""
