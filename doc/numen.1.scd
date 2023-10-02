@@ -59,6 +59,13 @@ simulate the right keys. For example, if you use the French *fr* layout:
 *--mic=*_AUDIO_DEVICE_
 	Specify the audio device. Like *arecord -D*.
 
+*--models=*_PATHS_
+	Specify the speech recognition models to load, with each filepath
+	separated by whitespace. The first model is the model used initially.
+
+	*numen* should work with most of the \**-small* and \**-lgraph*
+	models from *https://alphacephei.com/vosk/models*.
+
 *--phraselog=*_FILE_
 	Write phrases to _FILE_ while they're performed.
 
@@ -163,6 +170,12 @@ a warning.
 *...*++
 *$ echo load /etc/numen/phrases/\*.phrases | numenc*
 
+*tmodel* [_INDEX_]
+	Switch the model used for future *@transcribe* to the *n*th in the list
+	specified with *--models*. For example, to switch to the second model:
+
+	*tmodel 2*
+
 *handler* *gadget*/*uinput*/*x11*
 	Change between the *--gadget*, *--uinput* and *--x11* modes.
 
@@ -239,13 +252,6 @@ if not set otherwise, for convenience in actions.  (*$XDG_STATE_HOME* is
 - *$NUMEN_STATE_DIR/mods* contains the state of the modifier keys.
 - *$NUMEN_STATE_DIR/phrase* contains the previous phrase.
 - *$NUMEN_STATE_DIR/transcripts* contains the results of the *@transcribe* tag.
-
-# DIFFERENT MODELS AND LANGUAGES
-
-Properly supporting/testing different speech recognition models and spoken
-languages is on the todo list, but *numen* should work with any of the *small*
-models from *https://alphacephei.com/vosk/models*. Use the environment
-variable *NUMEN_MODEL* to specify the path to the model directory.
 
 # EXAMPLES
 
