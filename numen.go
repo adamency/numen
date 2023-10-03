@@ -325,16 +325,16 @@ func (r *Recognition) Free() {
 	}
 }
 
-func loadModels(paths string) []*vosk.VoskModel {
-	if paths == "" {
+func loadModels() []*vosk.VoskModel {
+	if opts.Models == "" {
 		if _, err := os.Stat(DefaultModel); errors.Is(err, os.ErrNotExist) {
 			fatal("The default model doesn't exist: " + DefaultModel + `
 so specify --models or install the default model package: ` + DefaultModelPackage)
 		}
-		paths = DefaultModel
+		opts.Models = DefaultModel
 	}
 
-	fields := strings.Fields(paths)
+	fields := strings.Fields(opts.Models)
 	if opts.Verbose {
 		fmt.Fprintf(os.Stderr, "Models: %q\n", fields)
 	}
@@ -509,7 +509,7 @@ func main() {
 	rec := &Recognition{}
 	defer rec.Free()
 
-	rec.Models = loadModels(opts.Models)
+	rec.Models = loadModels()
 
 	actions, err := parseFiles(opts.Files, opts.Handler, rec.Models[0])
 	if err != nil {

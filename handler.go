@@ -233,6 +233,10 @@ func handle(handler *Handler, action string) {
 			rec := h.Rec()
 			if err == nil && i >= 1 && i <= len(rec.TranRecs) {
 				rec.TranRec = rec.TranRecs[i-1]
+				if opts.Verbose {
+					m := strings.Fields(opts.Models)[i-1]
+					fmt.Fprintln(os.Stderr, "Transcription Model: "+m)
+				}
 			} else {
 				warn("invalid argument: " + line)
 			}
