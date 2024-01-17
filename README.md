@@ -107,7 +107,7 @@ You're also welcome to join the Matrix chat at
 
 AGPLv3 only, see [LICENSE](./LICENSE).
 
-Copyright (c) 2022-2023 John Gebbie
+Copyright (c) 2022-2024 John Gebbie
 
 ## Extra Responsive Hack
 
