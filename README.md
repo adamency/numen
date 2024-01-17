@@ -108,3 +108,16 @@ You're also welcome to join the Matrix chat at
 AGPLv3 only, see [LICENSE](./LICENSE).
 
 Copyright (c) 2022-2023 John Gebbie
+
+## Extra Responsive Hack
+
+You can append these lines to your model's *conf/model.conf* to make things
+extra responsive:
+
+    --endpoint.rule2.min-trailing-silence=0.25
+    --endpoint.rule3.min-trailing-silence=0.25
+    --endpoint.rule4.min-trailing-silence=0.3
+
+The default model is */usr/share/vosk-models/small-en-us*, but you can edit
+a copy instead and specify it with the *NUMEN_MODEL* environment variable. We
+should be able to implement better with the next Vosk release.
