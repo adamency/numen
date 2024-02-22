@@ -309,7 +309,6 @@ CANCEL:
 
 func main() {
 	var opts struct {
-		Audio     string
 		AudioLog  *os.File
 		Files     []string
 		Handler   string
@@ -318,11 +317,12 @@ func main() {
 		Verbose   bool
 	}
 	opts.Handler = "uinput"
+	audio := &Audio{}
 	{
 		o := opt.NewOptionSet()
 
 		o.Func("audio", func(s string) error {
-			opts.Audio = s
+			audio.Filename = s
 			return nil
 		})
 
@@ -482,28 +482,19 @@ func main() {
 	defer cmdRec.Free()
 	defer transRec.Free()
 
-	var mic string
-	var audio io.Reader
+	if audio.Filename == "" {
+		audio.SetDevice(opts.Mic)
+		if opts.Verbose {
+			fmt.Fprintln(os.Stderr, "Microphone: "+audio.Device)
+		}
+	}
+	if err := audio.Start(); err != nil {
+		fatal(err)
+	}
+	defer audio.Close()
+
 	var noiseRec *NoiseRecognizer
 	var noiseBuffer *bytes.Buffer
-	if opts.Audio == "" {
-		mic = getMic(opts.Mic)
-		if opts.Verbose {
-			fmt.Fprintln(os.Stderr, "Microphone: "+mic)
-		}
-		var err error
-		audio, err = record(mic)
-		if err != nil {
-			fatal(err)
-		}
-	} else {
-		f, err := os.Open(opts.Audio)
-		if err != nil {
-			fatal(err)
-		}
-		defer f.Close()
-		audio = f
-	}
 	if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
 		noiseBuffer = new(bytes.Buffer)
 		noiseRec = NewNoiseRecognizer(noiseBuffer, blow, hiss, shush)
@@ -594,14 +585,12 @@ func main() {
 		default:
 		}
 		chunk := make([]byte, 4096)
-		_, err := io.ReadFull(audio, chunk)
+		_, err := io.ReadFull(audio.Reader(), chunk)
 		if err != nil {
 			if err == io.EOF || err == io.ErrUnexpectedEOF {
-				if mic != "" && retry {
-					r, err := record(mic)
-					if err == nil {
-						audio = r
-					} else {
+				if audio.Filename == "" && retry {
+					_ = audio.Close()
+					if err := audio.Start(); err != nil {
 						warn(err)
 					}
 					continue
