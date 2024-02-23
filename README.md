@@ -82,7 +82,9 @@ keyboard-based programs like [Neovim](https://neovim.io) and
 environment I made, called [Tiles](https://git.sr.ht/~geb/tiles), that
 doesn't require a pointer device for window management, file picking, etc.
 
-The [manpage](doc/numen.1.scd) covers configuring Numen.
+If you'd like to tweak the phrases, copy the default phrases to
+`~/.config/numen/phrases` and edit them there. The [manpage](doc/numen.1.scd)
+covers configuration.
 
 ## Mailing List and Matrix Chat
 
