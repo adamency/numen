@@ -96,10 +96,12 @@ You're also welcome to join the Matrix chat at
 
 ## See Also
 
+* [sprec](https://git.sr.ht/~geb/sprec) - a speech recognition command
+  (if you're just looking for speech to text)
 * [Tiles](https://git.sr.ht/~geb/tiles) - a minimal desktop environment
-  suited to voice control.
-* [Noggin](https://git.sr.ht/~geb/noggin) - face tracking I use for
-  playing/developing games.
+  suited to voice control
+* [Noggin](https://git.sr.ht/~geb/noggin) - experimental face tracking I
+  made for playing games
 
 ## Support My Work 👀
 
