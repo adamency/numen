@@ -96,6 +96,8 @@ You're also welcome to join the Matrix chat at
 
 ## See Also
 
+* [awesome-numen](https://git.sr.ht/~geb/awesome-numen) - a list of Numen
+  configs and resources
 * [sprec](https://git.sr.ht/~geb/sprec) - a speech recognition command
   (if you're just looking for speech to text)
 * [Tiles](https://git.sr.ht/~geb/tiles) - a minimal desktop environment
