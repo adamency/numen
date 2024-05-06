@@ -314,16 +314,42 @@ CANCEL:
 
 type Recognition struct {
 	Models   []*vosk.VoskModel
+	Actions map[string]Action
+
 	CmdRec   *vox.Recognizer
 	TranRecs []*vox.Recognizer
 	TranRec  *vox.Recognizer
+	NoiseRec *NoiseRecognizer
+	NoiseBuffer *bytes.Buffer
+}
+
+func (r *Recognition) LoadPhrases(files []string) error {
+	var err error
+	r.Actions, err = parseFiles(files, opts.Handler, r.Models[0])
+	if err != nil {
+		return err
+	}
+	if r.CmdRec != nil {
+		r.CmdRec.SetGrm(getPhrases(r.Actions))
+	}
+
+	if blow, hiss, shush := haveNoises(r.Actions); blow || hiss || shush {
+		r.NoiseBuffer = bytes.NewBuffer([]byte(wavHeader))
+		r.NoiseRec = NewNoiseRecognizer(r.NoiseBuffer, blow, hiss, shush)
+	} else {
+		r.NoiseBuffer = nil
+		r.NoiseRec = nil
+	}
+	return nil
 }
 
 func (r *Recognition) Free() {
 	for i := range r.Models {
 		r.Models[i].Free()
 	}
-	r.CmdRec.Free()
+	if r.CmdRec != nil {
+		r.CmdRec.Free()
+	}
 	for i := range r.TranRecs {
 		r.TranRecs[i].Free()
 	}
@@ -517,12 +543,11 @@ func main() {
 
 	rec.Models = loadModels()
 
-	actions, err := parseFiles(opts.Files, opts.Handler, rec.Models[0])
-	if err != nil {
+	if err := rec.LoadPhrases(opts.Files); err != nil {
 		fatal(err)
 	}
 
-	rec.CmdRec, rec.TranRecs = makeRecognizers(rec.Models, getPhrases(actions))
+	rec.CmdRec, rec.TranRecs = makeRecognizers(rec.Models, getPhrases(rec.Actions))
 	rec.TranRec = rec.TranRecs[0]
 
 	if audio.Filename == "" {
@@ -536,40 +561,16 @@ func main() {
 	}
 	defer audio.Close()
 
-	var noiseRec *NoiseRecognizer
-	var noiseBuffer *bytes.Buffer
-	if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
-		noiseBuffer = new(bytes.Buffer)
-		noiseRec = NewNoiseRecognizer(noiseBuffer, blow, hiss, shush)
-	}
-
 	var handler *Handler
 	{
-		load := func(files []string) {
-			acts, err := parseFiles(files, opts.Handler, rec.Models[0])
-			if err != nil {
-				warn(err)
-				return
-			}
-			actions = acts
-			rec.CmdRec.SetGrm(getPhrases(actions))
-
-			if blow, hiss, shush := haveNoises(actions); blow || hiss || shush {
-				noiseBuffer = bytes.NewBuffer([]byte(wavHeader))
-				noiseRec = NewNoiseRecognizer(noiseBuffer, blow, hiss, shush)
-			} else {
-				noiseBuffer = nil
-				noiseRec = nil
-			}
-		}
 		if opts.Handler == "gadget" {
-			h := Handler(NewGadgetHandler(rec, load))
+			h := Handler(NewGadgetHandler(rec))
 			handler = &h
 		} else if opts.Handler == "uinput" {
-			h := Handler(NewUinputHandler(rec, load))
+			h := Handler(NewUinputHandler(rec))
 			handler = &h
 		} else if opts.Handler == "x11" {
-			h := Handler(NewX11Handler(rec, load))
+			h := Handler(NewX11Handler(rec))
 			handler = &h
 		} else {
 			panic("unreachable")
@@ -649,28 +650,28 @@ func main() {
 			}
 		}
 
-		if len(actions) == 0 {
+		if len(rec.Actions) == 0 {
 			continue
 		}
 
 		if transcribing == "" {
 			var finalized bool
 
-			if noiseRec != nil {
-				noiseBuffer.Write(chunk)
-				noiseRec.Proceed(len(chunk) / 2)
-				if noiseRec.Noise != noiseRec.PrevNoise {
-					if s := noiseEndString(noiseRec.PrevNoise); s != "" {
-						handle(handler, actions[s].Text)
+			if rec.NoiseRec != nil {
+				rec.NoiseBuffer.Write(chunk)
+				rec.NoiseRec.Proceed(len(chunk) / 2)
+				if rec.NoiseRec.Noise != rec.NoiseRec.PrevNoise {
+					if s := noiseEndString(rec.NoiseRec.PrevNoise); s != "" {
+						handle(handler, rec.Actions[s].Text)
 						writeLine(opts.PhraseLog, s)
 					}
-					if s := noiseBeginString(noiseRec.Noise); s != "" {
-						handle(handler, actions[s].Text)
+					if s := noiseBeginString(rec.NoiseRec.Noise); s != "" {
+						handle(handler, rec.Actions[s].Text)
 						writeLine(opts.PhraseLog, s)
 						finalized = true
 					}
 				}
-				if !finalized && noiseRec.Noise != NoiseNone {
+				if !finalized && rec.NoiseRec.Noise != NoiseNone {
 					continue
 				}
 			}
@@ -697,7 +698,7 @@ PHRASE:
 							valid = false
 							break
 						}
-						for _, t := range actions[phrase.Text].Tags {
+						for _, t := range rec.Actions[phrase.Text].Tags {
 							if t == "transcribe" {
 								valid = true
 								break PHRASE
@@ -706,16 +707,16 @@ PHRASE:
 					}
 
 					if valid {
-						transcribing = do(rec.CmdRec, rec.TranRec, handler, sentence, actions, rec.CmdRec.Audio, opts.PhraseLog)
+						transcribing = do(rec.CmdRec, rec.TranRec, handler, sentence, rec.Actions, rec.CmdRec.Audio, opts.PhraseLog)
 						if transcribing == "" {
-							handle(handler, actions["<complete>"].Text)
+							handle(handler, rec.Actions["<complete>"].Text)
 						}
 						break
 					}
 				}
 
 				if !valid {
-					if a, ok := actions["<unknown>"]; ok {
+					if a, ok := rec.Actions["<unknown>"]; ok {
 						writeLine(opts.PhraseLog, "<unknown>")
 						handle(handler, a.Text)
 					}
@@ -727,9 +728,9 @@ PHRASE:
 				panic(err)
 			}
 			if finalized {
-				handleTranscribe(handler, rec.TranRec.FinalResults(), actions[transcribing])
+				handleTranscribe(handler, rec.TranRec.FinalResults(), rec.Actions[transcribing])
 				writeLine(opts.PhraseLog, transcribing)
-				handle(handler, actions["<complete>"].Text)
+				handle(handler, rec.Actions["<complete>"].Text)
 				transcribing = ""
 			}
 		}

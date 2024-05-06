@@ -149,15 +149,15 @@ func handle(handler *Handler, action string) {
 			s = strings.TrimSpace(s)
 			if s == "gadget" {
 				h.Close()
-				*handler = NewGadgetHandler(h.Rec(), h.Load)
+				*handler = NewGadgetHandler(h.Rec())
 				writeStateFile("handler", []byte(s))
 			} else if s == "uinput" {
 				h.Close()
-				*handler = NewUinputHandler(h.Rec(), h.Load)
+				*handler = NewUinputHandler(h.Rec())
 				writeStateFile("handler", []byte(s))
 			} else if s == "x11" {
 				h.Close()
-				*handler = NewX11Handler(h.Rec(), h.Load)
+				*handler = NewX11Handler(h.Rec())
 				writeStateFile("handler", []byte(s))
 			} else {
 				warn("unknown handler: " + line)
@@ -304,14 +304,13 @@ type UinputHandler struct {
 	dotool                  *exec.Cmd
 	stdin                   io.WriteCloser
 	rec                     *Recognition
-	load                    func(files []string)
 	super, ctrl, alt, shift bool
 	caps                    bool
 	cache                   string
 	stuck                   string
 }
 
-func NewUinputHandler(rec *Recognition, load func(files []string)) *UinputHandler {
+func NewUinputHandler(rec *Recognition) *UinputHandler {
 	dotool := exec.Command("dotool")
 	stdin, err := dotool.StdinPipe()
 	if err != nil {
@@ -321,7 +320,7 @@ func NewUinputHandler(rec *Recognition, load func(files []string)) *UinputHandle
 	if err := dotool.Start(); err != nil {
 		fatal(err)
 	}
-	uh := &UinputHandler{dotool: dotool, stdin: stdin, rec: rec, load: load}
+	uh := &UinputHandler{dotool: dotool, stdin: stdin, rec: rec}
 	uh.Keydelay(defaultKeyDelay)
 	uh.Keyhold(defaultKeyHold)
 	uh.Typedelay(defaultTypeDelay)
@@ -414,7 +413,9 @@ func (uh *UinputHandler) Keyup(chords string) {
 }
 
 func (uh *UinputHandler) Load(files []string) {
-	uh.load(files)
+	if err := uh.rec.LoadPhrases(files); err != nil {
+		warn(err)
+	}
 }
 
 func (uh *UinputHandler) Mod(mod string) {
@@ -493,7 +494,7 @@ type GadgetHandler struct {
 	*UinputHandler
 }
 
-func NewGadgetHandler(rec *Recognition, load func(files []string)) *GadgetHandler {
+func NewGadgetHandler(rec *Recognition) *GadgetHandler {
 	if _, err := exec.LookPath("gadget"); err != nil {
 		fatal(`the gadget handler requires the gadget command:
     https://git.sr.ht/~geb/gadget`)
@@ -507,7 +508,7 @@ func NewGadgetHandler(rec *Recognition, load func(files []string)) *GadgetHandle
 	if err := gadget.Start(); err != nil {
 		fatal(err)
 	}
-	gh := &GadgetHandler{&UinputHandler{dotool: gadget, stdin: stdin, rec: rec, load: load}}
+	gh := &GadgetHandler{&UinputHandler{dotool: gadget, stdin: stdin, rec: rec}}
 	gh.Keydelay(defaultKeyDelay)
 	gh.Keyhold(defaultKeyHold)
 	gh.Typedelay(defaultTypeDelay)
@@ -524,15 +525,14 @@ func (gh *GadgetHandler) Caps(b bool) {
 
 type X11Handler struct {
 	rec                                    *Recognition
-	load                                   func(files []string)
 	super, ctrl, alt, shift                bool
 	cache                                  string
 	stuck                                  string
 	keyDelay, keyHold, typeDelay, typeHold int
 }
 
-func NewX11Handler(rec *Recognition, load func(files []string)) *X11Handler {
-	xh := &X11Handler{rec: rec, load: load}
+func NewX11Handler(rec *Recognition) *X11Handler {
+	xh := &X11Handler{rec: rec}
 	xh.Keydelay(defaultKeyDelay)
 	xh.Keyhold(defaultKeyHold)
 	xh.Typedelay(defaultTypeDelay)
@@ -646,7 +646,9 @@ func (xh *X11Handler) Keyup(chords string) {
 }
 
 func (xh *X11Handler) Load(files []string) {
-	xh.load(files)
+	if err := xh.rec.LoadPhrases(files); err != nil {
+		warn(err)
+	}
 }
 
 func (xh *X11Handler) Mod(mod string) {
