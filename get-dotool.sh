@@ -1,8 +1,8 @@
 #!/bin/sh
 # ./get-dotool.sh ['install']
-version=7688cc321c18420ac44abdb5d0acaba09af1675b
+version=1.5
 distfile="https://git.sr.ht/~geb/dotool/archive/$version.tar.gz"
-checksum=6b331da5d52fc6f3c987fe7c85b6984c484eb43640eb940097143ff6523d11c9
+checksum=265d23a3883f2497b862e80e729dd71b86358c294cf0b608ac889a21fa96815e
 
 if [ "$*" != '' ] && [ "$*" != install ]; then
 	echo bad usage
