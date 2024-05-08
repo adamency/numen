@@ -228,6 +228,22 @@ func handle(handler *Handler, action string) {
 			} else {
 				warn("invalid argument: " + line)
 			}
+		} else if s, ok := cutWord(line, "ctimeouts"); ok {
+			var t1, t2 float64
+			if _, err := fmt.Sscanf(s+"\n", "%f %f\n", &t1, &t2); err == nil {
+				h.Rec().CmdRec.SetEndpointerDelays(5, t1, t2)
+			} else {
+				warn("invalid argument: " + line)
+			}
+		} else if s, ok := cutWord(line, "ttimeouts"); ok {
+			var t1, t2 float64
+			if _, err := fmt.Sscanf(s+"\n", "%f %f\n", &t1, &t2); err == nil {
+				for _, tr := range h.Rec().TranRecs {
+					tr.SetEndpointerDelays(5, t1, t2)
+				}
+			} else {
+				warn("invalid argument: " + line)
+			}
 		} else if s, ok := cutWord(line, "tmodel"); ok {
 			i, err := strconv.Atoi(s)
 			rec := h.Rec()

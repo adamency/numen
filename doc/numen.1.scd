@@ -170,6 +170,16 @@ a warning.
 *...*++
 *$ echo load /etc/numen/phrases/\*.phrases | numenc*
 
+*ctimeouts* _MILLISECONDS_ _MILLISECONDS_
+	Set speech recognition timeouts for commanding. The first is the
+	timeout after something has been recognized. The second is the
+	timeout for an utterance.
+
+*ttimeouts* _MILLISECONDS_ _MILLISECONDS_
+	Set speech recognition timeouts for future *@transcribe*. The first
+	is the timeout after something has been recognized. The second is
+	the timeout for an utterance.
+
 *tmodel* [_INDEX_]
 	Switch the model used for future *@transcribe* to the *n*th in the list
 	specified with *--models*. For example, to switch to the second model:
