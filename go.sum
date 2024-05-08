@@ -1,7 +1,7 @@
 git.sr.ht/~geb/opt v0.0.0-20221207200434-dad26d091d71 h1:jh3Ite7R1ZvdLt6j52e4njO2SS/z5dWOLXllw7inalc=
 git.sr.ht/~geb/opt v0.0.0-20221207200434-dad26d091d71/go.mod h1:S6h1g8P7DyG7i7YIHZ5IpYbC6lzZB9DYIEl8PyXOmsg=
-github.com/alphacep/vosk-api/go v0.3.46-0.20230429023501-12f29a3415e4 h1:MGwc3N+btl1ayMYPbe5VyK0vifwwmgsUbDxZd9auO2Y=
-github.com/alphacep/vosk-api/go v0.3.46-0.20230429023501-12f29a3415e4/go.mod h1:9X8IJsHnFk/b1xyvjlZifo+ZL5VTAx3LW+JQce/eRcA=
+github.com/alphacep/vosk-api/go v0.3.51-0.20240506053326-7358c799b1e1 h1:x45DSdtLeAT1xAuSdQh3Qm7tKL7oZ0MettWsVHq8GcM=
+github.com/alphacep/vosk-api/go v0.3.51-0.20240506053326-7358c799b1e1/go.mod h1:9X8IJsHnFk/b1xyvjlZifo+ZL5VTAx3LW+JQce/eRcA=
 github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/m7shapan/njson v1.0.8 h1:5FNWjy8WhZ53Ev4ricYPtZfAv7o3/7wAKL+zhXxknvg=
