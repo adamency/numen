@@ -394,6 +394,7 @@ func makeRecognizers(models []*vosk.VoskModel, phrases []string) (cmdRec *vox.Re
 	cmdRec.SetWords(true)
 	cmdRec.SetKeyphrases(true)
 	cmdRec.SetMaxAlternatives(3)
+	cmdRec.SetEndpointerDelays(5, 0.1, 15)
 
 	tranRecs = make([]*vox.Recognizer, len(models))
 	for i := range tranRecs {
@@ -403,6 +404,7 @@ func makeRecognizers(models []*vosk.VoskModel, phrases []string) (cmdRec *vox.Re
 			panic(err)
 		}
 		tranRecs[i].SetMaxAlternatives(10)
+		tranRecs[i].SetEndpointerDelays(5, 0.1, 15)
 	}
 	return
 }
