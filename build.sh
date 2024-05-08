@@ -3,8 +3,8 @@
 : "${NUMEN_VERSION=$(git describe --long --abbrev=12 --tags --dirty 2>/dev/null || echo 0.7)}"
 : "${NUMEN_DESTDIR=}"
 : "${NUMEN_BINDIR=usr/local/bin}"
-: "${NUMEN_DEFAULT_PHRASES_DIR=/etc/numen/phrases}"
-: "${NUMEN_SCRIPTS_DIR=/etc/numen/scripts}"
+: "${NUMEN_DEFAULT_PHRASES_DIR=/usr/share/numen/phrases}"
+: "${NUMEN_SCRIPTS_DIR=/usr/share/numen/scripts}"
 : "${NUMEN_DEFAULT_MODEL_PACKAGE=vosk-model-small-en-us}"
 : "${NUMEN_DEFAULT_MODEL=/usr/share/vosk-models/small-en-us}"
 
@@ -37,7 +37,7 @@ else
 	install -Dm755 numen numenc -t "$NUMEN_DESTDIR/$NUMEN_BINDIR" || exit
 	install -Dm755 scripts/* -t "$NUMEN_DESTDIR/$NUMEN_SCRIPTS_DIR" || exit
 	install -Dm644 phrases/* -t "$NUMEN_DESTDIR/$NUMEN_DEFAULT_PHRASES_DIR" || exit
-	sed -i "s:/etc/numen/scripts:$NUMEN_SCRIPTS_DIR:g" \
+	sed -i "s:/usr/share/numen/scripts:$NUMEN_SCRIPTS_DIR:g" \
 		"$NUMEN_DESTDIR/$NUMEN_SCRIPTS_DIR"/* \
 		"$NUMEN_DESTDIR/$NUMEN_DEFAULT_PHRASES_DIR"/* || exit
 	mkdir -p "$NUMEN_DESTDIR/usr/share/man/man1" || exit

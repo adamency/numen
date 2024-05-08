@@ -22,7 +22,7 @@ var (
 	Version             string
 	DefaultModelPackage = "vosk-model-small-en-us"
 	DefaultModel        = "/usr/share/vosk-models/small-en-us"
-	DefaultPhrasesDir   = "/etc/numen/phrases"
+	DefaultPhrasesDir   = "/usr/share/numen/phrases"
 )
 
 func usage() {

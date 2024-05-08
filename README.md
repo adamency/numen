@@ -72,7 +72,7 @@ If nothing happened, check it's using the right audio device with:
 and specify a `--mic` from `--list-mics` if not.
 
 Now you're ready to have a go in your text editor! The default phrases are
-in the `/etc/numen/phrases` directory.
+in the `/usr/share/numen/phrases` directory.
 
 ## Going Further
 

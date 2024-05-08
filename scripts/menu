@@ -6,10 +6,10 @@
 dmenu="${NUMEN_DMENU:-"${DMENU:-dmenu}"}"
 dmenu_opts="${NUMEN_DMENU_OPTS:--i -l 10}"
 
-export DISPLAY="$(/etc/numen/scripts/displaying)"
+export DISPLAY="$(/usr/share/numen/scripts/displaying)"
 
 f="$NUMEN_STATE_DIR/transcripts"
-s="$(/etc/numen/scripts/transcripts)"
+s="$(/usr/share/numen/scripts/transcripts)"
 if [ "$1" ]; then
 	if [ "$(wc -l < "$f")" -gt 1 ]; then
 		if ! t="$(printf %s\\n "$s" | tail -n +2 | "$dmenu" $dmenu_opts)"; then

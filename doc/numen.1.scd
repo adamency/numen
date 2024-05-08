@@ -14,9 +14,9 @@ numen(1)
 actions when you say their phrases.
 
 With no arguments, *numen* uses the default phrases in the
-*/etc/numen/phrases/* directory, unless you've put files ending with *.phrases*
-in the *$XDG_CONFIG_HOME/numen/phrases/* directory. (*$XDG_CONFIG_HOME*
-is *~/.config* unless set otherwise.)
+*/usr/share/numen/phrases/* directory, unless you've put files
+ending with *.phrases* in the *$XDG_CONFIG_HOME/numen/phrases/*
+directory. (*$XDG_CONFIG_HOME* is *~/.config* unless set otherwise.)
 
 There is also the *numenc* command to trigger actions programmatically.
 
@@ -168,7 +168,7 @@ a warning.
 
 	*$ echo load | numenc*++
 *...*++
-*$ echo load /etc/numen/phrases/\*.phrases | numenc*
+*$ echo load /usr/share/numen/phrases/\*.phrases | numenc*
 
 *ctimeouts* _MILLISECONDS_ _MILLISECONDS_
 	Set speech recognition timeouts for commanding. The first is the
@@ -267,7 +267,7 @@ if not set otherwise, for convenience in actions.  (*$XDG_STATE_HOME* is
 
 Run *numen* with the default phrases:
 
-	*$ numen /etc/numen/phrases/\*.phrases*
+	*$ numen /usr/share/numen/phrases/\*.phrases*
 
 There shouldn't be any output but you should be able to type *hey* by saying
 "hoof each yank". You can also try transcribing a sentence after saying
