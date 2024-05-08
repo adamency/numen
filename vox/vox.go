@@ -70,6 +70,9 @@ func (r *Recognizer) Free() {
 	r.VoskRecognizer.Free()
 }
 
+func (r *Recognizer) SetEndpointerDelays(startMax, end, max float64) {
+	r.VoskRecognizer.SetEndpointerDelays(startMax, end, max)
+}
 func (r *Recognizer) SetGrm(phrases []string) {
 	j, err := json.Marshal(phrases)
 	if err != nil {
