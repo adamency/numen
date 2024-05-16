@@ -60,7 +60,6 @@ type Handler interface {
 	Cached() string
 	Chords(chords string) string
 	Rec() *Recognition
-	Sticky() bool
 
 	Buttondown(button int)
 	Buttonup(button int)
@@ -389,10 +388,6 @@ func (uh *UinputHandler) Rec() *Recognition {
 	return uh.rec
 }
 
-func (uh *UinputHandler) Sticky() bool {
-	return uh.stuck != ""
-}
-
 func (uh *UinputHandler) Buttondown(button int) {
 	uh.write(fmt.Sprintln("buttondown", button))
 }
@@ -614,10 +609,6 @@ func (xh *X11Handler) Chords(chords string) string {
 		s += mods + f + " "
 	}
 	return s
-}
-
-func (xh *X11Handler) Sticky() bool {
-	return xh.stuck != ""
 }
 
 func (xh *X11Handler) Rec() *Recognition {

@@ -685,7 +685,7 @@ func main() {
 					panic(err)
 				}
 			}
-			if finalized || ((*handler).Sticky() && rec.CmdRec.Results()[0].Text != "") {
+			if finalized {
 				var result vox.Result
 				var valid bool
 				for _, result = range rec.CmdRec.FinalResults() {
