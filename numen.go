@@ -686,12 +686,12 @@ func main() {
 				}
 			}
 			if finalized {
-				var result vox.Result
-				var valid bool
-				for _, result = range rec.CmdRec.FinalResults() {
+				var valid, nonempty bool
+				for _, result := range rec.CmdRec.FinalResults() {
 					if result.Text == "" {
 						continue
 					}
+					nonempty = true
 					sentence := result.Phrases
 					valid = result.Valid
 PHRASE:
@@ -717,7 +717,7 @@ PHRASE:
 					}
 				}
 
-				if !valid {
+				if !valid && nonempty {
 					if a, ok := rec.Actions["<unknown>"]; ok {
 						writeLine(opts.PhraseLog, "<unknown>")
 						handle(handler, a.Text)
